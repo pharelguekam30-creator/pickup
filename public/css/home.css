@@ -1,0 +1,116 @@
+.login-encadre {
+    border: 3px solid #2e7d32;
+    box-shadow: 0 8px 32px rgba(46,125,50,0.15);
+    padding: 35px 30px 30px 30px;
+    margin-top: 60px;
+    position: relative;
+}
+.input-icon {
+    display: flex;
+    align-items: center;
+    background: #f0f0f0;
+    border-radius: 6px;
+    padding: 0 10px;
+    border: 1px solid #c8e6c9;
+}
+.input-icon i {
+    color: #4CAF50;
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+.login-custom button.btn i {
+    margin-right: 7px;
+}
+.login-custom {
+    background: linear-gradient(120deg, #e8f5e9 0%, #f5f5f5 100%);
+    border: 2px solid #4CAF50;
+    box-shadow: 0 4px 24px rgba(46,125,50,0.08);
+}
+.login-custom h2 {
+    letter-spacing: 1px;
+}
+.input-group {
+    margin-bottom: 18px;
+}
+.input-group label {
+    font-weight: bold;
+    color: #2e7d32;
+    margin-bottom: 5px;
+    display: block;
+}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+}
+
+header {
+    background: #4CAF50;
+    padding: 10px;
+    text-align: center;
+}
+
+header nav a {
+    color: white;
+    margin: 0 15px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.hero {
+    text-align: center;
+    padding: 60px 20px;
+    background: #e8f5e9;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    color: #2e7d32;
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.btn {
+    background: #2e7d32;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.auth-container, .dashboard, .services-list, .avis-list {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+input, select, textarea, button {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    font-size: 1rem;
+}
+
+textarea {
+    resize: vertical;
+}
+
+button {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover, .btn:hover {
+    opacity: 0.9;
+}

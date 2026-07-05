@@ -16,7 +16,7 @@
             <p>Proposez vos services de vidange aux ménages.</p>
         </div>
 
-        <div class="role-card" onclick="window.location='{{ route('register', ['role' => 'menage']) }}'">
+        <div class="role-card" onclick="window.location='{{ route('register', ['role' => 'menagere']) }}'">
             <img src="{{ asset('images/menage.png.jpeg') }}" alt="Ménagere">
             <h3>Je suis un Ménage</h3>
             <p>Réservez facilement un vidangeur proche de chez vous.</p>

@@ -12,6 +12,8 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\AvisController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ChatController;
 
 // ========================
 // Accueil
@@ -45,12 +47,17 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':vidangeu
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
+    Route::get('/admin/stats', [DashboardController::class, 'stats'])->name('admin.stats');
 });
 
 // ========================
 // Services (consultation publique)
 // ========================
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+Route::get('/carte-vidangeurs', [App\Http\Controllers\MapController::class, 'index'])->name('map.index');
+Route::get('/map-test', [App\Http\Controllers\MapController::class, 'test'])->name('map.test');
+Route::get('/carte', [App\Http\Controllers\MapController::class, 'embed'])->name('map.embed');
+Route::get('/map-simple', [App\Http\Controllers\MapController::class, 'simple'])->name('map.simple');
 
 // ========================
 // Routes RESTful protégées (admin)
@@ -75,12 +82,63 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':vidangeu
 });
 
 // ========================
+// Confirmation menagere
+// ========================
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':menagere'])->group(function () {
+    Route::post('reservations/{reservation}/confirm', [ReservationController::class, 'confirmComplete'])->name('reservations.confirm');
+});
+
+// ========================
+// Admin : forcer paiement / annulation
+// ========================
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->group(function () {
+    Route::post('admin/reservations/{reservation}/force-complete', [ReservationController::class, 'adminForceComplete'])->name('admin.forceComplete');
+    Route::post('admin/reservations/{reservation}/force-cancel', [ReservationController::class, 'adminForceCancel'])->name('admin.forceCancel');
+});
+
+// ========================
 // Avis (seulement pour ménagère)
 // ========================
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':menagere'])->group(function () {
     Route::get('/services/{service}/avis/create', [AvisController::class, 'create'])->name('avis.create');
     Route::post('/avis', [AvisController::class, 'store'])->name('avis.store');
     Route::get('/mes-avis', [AvisController::class, 'index'])->name('avis.index');
+});
+
+// ========================
+// Profil utilisateur connecté
+// ========================
+Route::middleware('auth')->get('/profile', [UserController::class, 'profile'])->name('profile');
+Route::middleware('auth')->get('/profile/edit', [UserController::class, 'profileEdit'])->name('profile.edit');
+Route::middleware('auth')->put('/profile', [UserController::class, 'profileUpdate'])->name('profile.update');
+
+// ========================
+// Paiements et portefeuille
+// ========================
+Route::middleware('auth')->group(function () {
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::get('/payments/deposit', [PaymentController::class, 'depositForm'])->name('payments.deposit.form');
+    Route::post('/payments/deposit', [PaymentController::class, 'deposit'])->name('payments.deposit');
+    Route::get('/payments/withdraw', [PaymentController::class, 'withdrawForm'])->name('payments.withdraw.form');
+    Route::post('/payments/withdraw', [PaymentController::class, 'withdraw'])->name('payments.withdraw');
+});
+
+// ========================
+// Chat entre menagere et vidangeur
+// ========================
+Route::middleware('auth')->group(function () {
+    Route::get('/chat/{reservation}', [ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{reservation}/send', [ChatController::class, 'send'])->name('chat.send');
+    Route::get('/chat/{reservation}/messages', [ChatController::class, 'fetch'])->name('chat.fetch');
+});
+
+// ========================
+// Vérification du compte
+// ========================
+Route::middleware('auth')->group(function () {
+    Route::get('/verification', [AuthController::class, 'verificationForm'])->name('verification.form');
+    Route::post('/verification', [AuthController::class, 'verify'])->name('verification.verify');
+    Route::post('/verification/resend', [AuthController::class, 'resendCode'])->name('verification.resend');
 });
 
 // ========================

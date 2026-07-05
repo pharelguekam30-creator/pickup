@@ -7,7 +7,7 @@
     <h2 style="font-size:2rem;font-weight:bold;color:#2563eb;margin-bottom:2rem;text-align:center;">Nouvelle demande d’intervention</h2>
 
     @if($errors->any())
-        <div style="background:#c72121;color:#b91c1c;padding:.75rem 1rem;border-radius:.5rem;margin-bottom:1.5rem;">
+        <div style="background:#fecaca;color:#991b1b;padding:.75rem 1rem;border-radius:.5rem;margin-bottom:1.5rem;">
             <ul style="margin:0; padding-left:1.25rem;">
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -24,7 +24,7 @@
             <select name="user_id" required style="width:100%;padding:.7rem 1rem;border-radius:1rem;border:1px solid #cbd5e1;margin-top:.3rem;">
                 <option value="">Sélectionnez un vidangeur</option>
                 @foreach($vidangeurs as $vidangeur)
-                    <option value="{{ $vidangeur->id }}">
+                    <option value="{{ $vidangeur->id }}" {{ (isset($selectedVidangeur) && $selectedVidangeur->id == $vidangeur->id) ? 'selected' : '' }}>
                         {{ $vidangeur->name }} - {{ $vidangeur->city ?? '' }} {{ $vidangeur->quarter ?? '' }}
                     </option>
                 @endforeach

@@ -10,10 +10,7 @@ class RoleController extends Controller
     /**
      * Applique le middleware pour restreindre l’accès aux admins.
      */
-    public function __construct()
-    {
-        $this->middleware(['auth', 'isAdmin']);
-    }
+    // protected by route middleware already
 
     /**
      * Affiche la liste des rôles.

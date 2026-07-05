@@ -26,7 +26,7 @@ return new class extends Migration
     {
         Schema::table('avis', function (Blueprint $table) {
             if (Schema::hasColumn('avis', 'service_id')) {
-                $table->dropForeignIdFor('service_id');
+                $table->dropConstrainedForeignId('service_id');
                 $table->dropColumn('service_id');
             }
         });

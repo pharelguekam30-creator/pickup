@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') - Pickup</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png.jpeg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/fontawesome/all.min.css">
+    @stack('styles')
     <style>
         /* RESET */
         * {
@@ -44,8 +46,17 @@
         }
 
         .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             font-size: 1.5rem;
             font-weight: bold;
+        }
+
+        .logo img {
+            height: 32px;
+            width: auto;
+            border-radius: 8px;
         }
 
         header nav a {
@@ -89,7 +100,7 @@
         }
 
         .main-background {
-            background: url('{{ asset("images/background.jpg") }}') no-repeat center center / cover;
+            background: url('{{ asset("images/fond.jpeg") }}') no-repeat center center / cover;
             position: relative;
             min-height: 80vh;
             display: flex;
@@ -430,17 +441,25 @@
     <header>
         <div class="header-container">
             <div class="logo">
-                <i class="fa fa-recycle"></i> Pickup
+                <img src="{{ asset('images/logo.png.jpeg') }}" alt="Pickup logo">
+                Pickup
             </div>
             <nav>
                 <a href="{{ route('home') }}">Accueil</a>
                 <a href="{{ route('services.index') }}">Services</a>
+                <a href="{{ route('map.index') }}">Carte</a>
 
                 @auth
                     @if(auth()->user()->role == 'menagere')
                         <a href="{{ route('avis.index') }}">Avis</a>
+                        <a href="{{ route('menagere.dashboard') }}">Dashboard</a>
+                    @elseif(auth()->user()->role == 'vidangeur')
+                        <a href="{{ route('vidangeur.dashboard') }}">Dashboard</a>
+                    @elseif(auth()->user()->role == 'admin')
+                        <a href="{{ route('dashboard') }}">Dashboard</a>
                     @endif
-                    <a href="{{ route('dashboard') }}">Dashboard</a>
+                    <a href="{{ route('payments.index') }}">Portefeuille</a>
+                    <a href="{{ route('profile') }}">Mon Profil</a>
 
                     <form action="{{ route('logout') }}" method="POST" class="logout-form">
                         @csrf
@@ -463,11 +482,26 @@
                 </div>
             </div>
         @else
-            <div class="page-wrapper">
-                @yield('content')
+            <div style="display:flex;gap:1.5rem;max-width:1200px;margin:0 auto;padding:0 20px;">
+                @hasSection('sidebar')
+                    <aside style="width:220px;flex-shrink:0;background:#fff;border-radius:16px;padding:1.25rem;box-shadow:0 4px 12px rgba(15,23,42,0.06);">
+                        @yield('sidebar')
+                    </aside>
+                @endif
+                @hasSection('fullwidth')
+                    <div style="flex:1;min-width:0;">
+                        @yield('content')
+                    </div>
+                @else
+                    <div class="page-wrapper" style="flex:1;">
+                        @yield('content')
+                    </div>
+                @endif
             </div>
         @endif
     </main>
+
+    @stack('scripts')
 
     <!-- FOOTER -->
     <footer>

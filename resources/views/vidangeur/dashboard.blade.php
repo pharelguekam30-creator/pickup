@@ -27,6 +27,10 @@
             <p class="text-xs uppercase tracking-wide">Annulées</p>
             <p class="text-3xl font-bold">{{ $stats['canceled'] ?? 0 }}</p>
         </div>
+        <div class="dashboard-card" style="background:#ede9fe;color:#7c3aed;">
+            <p class="text-xs uppercase tracking-wide">A confirmer</p>
+            <p class="text-3xl font-bold">{{ $stats['awaiting_confirmation'] ?? 0 }}</p>
+        </div>
         <div class="dashboard-card completed" style="background:#dbeafe;color:#1e3a8a;">
             <p class="text-xs uppercase tracking-wide">Terminées</p>
             <p class="text-3xl font-bold">{{ $stats['completed'] ?? 0 }}</p>
@@ -66,8 +70,13 @@
                                     if($intervention->status === 'pending') $badge = 'badge-pending';
                                     if($intervention->status === 'canceled') $badge = 'badge-canceled';
                                     if($intervention->status === 'completed') $badge = 'badge-completed';
+                                    if($intervention->status === 'completed_vidangeur') $badge = 'badge-pending';
+                                    $label = match($intervention->status) {
+                                        'completed_vidangeur' => 'Attente client',
+                                        default => $intervention->status
+                                    };
                                 @endphp
-                                <span class="{{ $badge }}">{{ $intervention->status ?? 'pending' }}</span>
+                                <span class="{{ $badge }}">{{ $label }}</span>
                             </td>
                             <td class="px-4 py-3 space-x-2">
                                 @if($intervention->status === 'pending')
@@ -83,6 +92,9 @@
                                         <button type="submit" class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 transition">Terminé</button>
                                     </form>
                                 @endif
+                                @if($intervention->status === 'completed_vidangeur')
+                                    <span style="display:inline-block;padding:.3rem .6rem;background:#ede9fe;color:#7c3aed;border-radius:8px;font-size:.8rem;font-weight:600;">En attente du client</span>
+                                @endif
 
                                 <form method="POST" action="{{ route('reservations.cancel', $intervention->id) }}" class="inline">
                                     @csrf
@@ -94,6 +106,16 @@
                                     @method('DELETE')
                                     <button type="submit" class="px-3 py-1 rounded bg-gray-600 text-white hover:bg-gray-700 transition">Supprimer</button>
                                 </form>
+
+                                @if($intervention->client_id)
+                                    @php $nb = $unreadCounts[$intervention->id] ?? 0; @endphp
+                                    <a href="{{ route('chat.show', $intervention->id) }}" class="px-3 py-1 rounded inline-block text-center" style="font-size:.85rem;text-decoration:none;background:{{ $nb ? '#dbeafe' : '#e5e7eb' }};color:{{ $nb ? '#2563eb' : '#374151' }};display:inline-flex;align-items:center;gap:4px;">
+                                        Discuter
+                                        @if($nb > 0)
+                                            <span style="background:#ef4444;color:#fff;font-size:.65rem;padding:1px 6px;border-radius:10px;font-weight:700;">{{ $nb }}</span>
+                                        @endif
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @empty

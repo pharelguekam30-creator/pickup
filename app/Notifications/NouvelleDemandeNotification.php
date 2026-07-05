@@ -30,12 +30,12 @@ class NouvelleDemandeNotification extends Notification implements ShouldQueue
             ->greeting('Bonjour ' . $notifiable->name . ',')
             ->line('Vous avez un nouveau client ! Voici ses informations :')
             ->line('Nom : ' . ($this->reservation->client_name ?? ''))
-            ->line('Téléphone : ' . (auth()->user()->phone ?? ''))
-            ->line('Adresse : ' . (auth()->user()->address ?? ''))
-            ->line('Ville : ' . (auth()->user()->city ?? ''))
-            ->line('Quartier : ' . (auth()->user()->quarter ?? ''))
+            ->line('Téléphone : ' . ($this->reservation->client->phone ?? ''))
+            ->line('Adresse : ' . ($this->reservation->client->address ?? ''))
+            ->line('Ville : ' . ($this->reservation->client->city ?? ''))
+            ->line('Quartier : ' . ($this->reservation->client->quarter ?? ''))
             ->line('Service demandé : ' . ($this->reservation->service->name ?? ''))
-            ->line('Date de la demande : ' . ($this->reservation->date ?? ''))
+            ->line('Date de la demande : ' . (optional($this->reservation->reservation_date)->format('Y-m-d H:i') ?? ''))
             ->action('Voir la demande', url('/dashboard'))
             ->line('Merci d’utiliser notre plateforme !');
     }

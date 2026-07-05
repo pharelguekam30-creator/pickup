@@ -44,7 +44,7 @@ class CreateAdminUser extends Command
         $this->info("✅ Compte administrateur créé avec succès !");
         $this->line("📧 Email : <info>{$email}</info>");
         $this->line("🔐 Mot de passe : <info>{$password}</info>");
-        $this->line("🌐 Connectez-vous sur : <info>http://127.0.0.1:8000/login</info>");
+        $this->line("🌐 Connectez-vous sur : <info>" . url('/login') . "</info>");
 
         return 0;
     }

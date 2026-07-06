@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'isAdmin' => \App\Http\Middleware\IsAdminMiddleware::class,
             'verified' => \App\Http\Middleware\VerifiedUser::class,
         ]);
+        $middleware->append(\App\Http\Middleware\TrustProxies::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

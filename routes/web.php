@@ -15,14 +15,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ChatController;
 
-// ========================
-// Accueil
-// ========================
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// ========================
-// Authentification
-// ========================
 Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 
@@ -31,9 +25,6 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.su
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// ========================
-// Dashboards par rôle
-// ========================
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':menagere'])->group(function () {
     Route::get('/menagere/dashboard', [DashboardController::class, 'menagere'])->name('menagere.dashboard');
     Route::get('reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
@@ -45,23 +36,16 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':vidangeu
 });
 
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/admin/stats', [DashboardController::class, 'stats'])->name('admin.stats');
 });
 
-// ========================
-// Services (consultation publique)
-// ========================
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
 Route::get('/carte-vidangeurs', [App\Http\Controllers\MapController::class, 'index'])->name('map.index');
 Route::get('/map-test', [App\Http\Controllers\MapController::class, 'test'])->name('map.test');
 Route::get('/carte', [App\Http\Controllers\MapController::class, 'embed'])->name('map.embed');
 Route::get('/map-simple', [App\Http\Controllers\MapController::class, 'simple'])->name('map.simple');
 
-// ========================
-// Routes RESTful protégées (admin)
-// ========================
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class);
@@ -72,49 +56,31 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])
     Route::resource('accounts', AccountController::class);
 });
 
-// ========================
-// Routes Vidangeur
-// ========================
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':vidangeur'])->group(function () {
     Route::post('reservations/{reservation}/accept', [ReservationController::class, 'accept'])->name('reservations.accept');
     Route::post('reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
     Route::post('reservations/{reservation}/complete', [ReservationController::class, 'complete'])->name('reservations.complete');
 });
 
-// ========================
-// Confirmation menagere
-// ========================
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':menagere'])->group(function () {
     Route::post('reservations/{reservation}/confirm', [ReservationController::class, 'confirmComplete'])->name('reservations.confirm');
 });
 
-// ========================
-// Admin : forcer paiement / annulation
-// ========================
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->group(function () {
     Route::post('admin/reservations/{reservation}/force-complete', [ReservationController::class, 'adminForceComplete'])->name('admin.forceComplete');
     Route::post('admin/reservations/{reservation}/force-cancel', [ReservationController::class, 'adminForceCancel'])->name('admin.forceCancel');
 });
 
-// ========================
-// Avis (seulement pour ménagère)
-// ========================
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':menagere'])->group(function () {
     Route::get('/services/{service}/avis/create', [AvisController::class, 'create'])->name('avis.create');
     Route::post('/avis', [AvisController::class, 'store'])->name('avis.store');
     Route::get('/mes-avis', [AvisController::class, 'index'])->name('avis.index');
 });
 
-// ========================
-// Profil utilisateur connecté
-// ========================
 Route::middleware('auth')->get('/profile', [UserController::class, 'profile'])->name('profile');
 Route::middleware('auth')->get('/profile/edit', [UserController::class, 'profileEdit'])->name('profile.edit');
 Route::middleware('auth')->put('/profile', [UserController::class, 'profileUpdate'])->name('profile.update');
 
-// ========================
-// Paiements et portefeuille
-// ========================
 Route::middleware('auth')->group(function () {
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
     Route::get('/payments/deposit', [PaymentController::class, 'depositForm'])->name('payments.deposit.form');
@@ -123,27 +89,28 @@ Route::middleware('auth')->group(function () {
     Route::post('/payments/withdraw', [PaymentController::class, 'withdraw'])->name('payments.withdraw');
 });
 
-// ========================
-// Chat entre menagere et vidangeur
-// ========================
 Route::middleware('auth')->group(function () {
     Route::get('/chat/{reservation}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('/chat/{reservation}/send', [ChatController::class, 'send'])->name('chat.send');
     Route::get('/chat/{reservation}/messages', [ChatController::class, 'fetch'])->name('chat.fetch');
 });
 
-// ========================
-// Vérification du compte
-// ========================
 Route::middleware('auth')->group(function () {
     Route::get('/verification', [AuthController::class, 'verificationForm'])->name('verification.form');
     Route::post('/verification', [AuthController::class, 'verify'])->name('verification.verify');
     Route::post('/verification/resend', [AuthController::class, 'resendCode'])->name('verification.resend');
 });
 
-// ========================
-// Page de choix du rôle
-// ========================
+Route::middleware('auth')->get('/debug/mail', function () {
+    $user = auth()->user();
+    try {
+        \Illuminate\Support\Facades\Mail::mailer('smtp')->to($user->email)->send(new \App\Mail\VerificationCode('123456', $user->name));
+        return 'Email envoye avec succes a '.$user->email;
+    } catch (\Exception $e) {
+        return 'ERREUR: '.$e->getMessage();
+    }
+})->name('debug.mail');
+
 Route::get('/choose-role', function () {
     return view('auth.choose-role');
 })->name('choix.role');

@@ -83,23 +83,28 @@ class AuthController extends Controller
             $user->save();
         }
 
+        $emailSent = false;
         if ($channel === 'email' || $channel === 'both') {
             try {
-                Mail::to($user->email)->send(new VerificationCode($code, $user->name));
+                Mail::mailer('smtp')->to($user->email)->send(new VerificationCode($code, $user->name));
+                $emailSent = true;
             } catch (\Exception $e) {
                 Log::error('Echec envoi email verification: '.$e->getMessage());
-                return back()->withErrors(['email' => 'Erreur lors de l\'envoi de l\'email. Veuillez réessayer.'])->withInput();
             }
         }
 
         Auth::login($user);
 
-        $message = match ($channel) {
-            'email' => 'Un code de verification vous a ete envoye par email.',
-            'phone' => 'Un code de verification vous a ete envoye par téléphone.',
-            'both' => 'Un code de verification vous a ete envoye par email et par téléphone.',
-            default => 'Un code de verification vous a ete envoye.'
-        };
+        if ($emailSent) {
+            $message = match ($channel) {
+                'email' => 'Un code de verification vous a ete envoye par email.',
+                'phone' => 'Un code de verification vous a ete envoye par téléphone.',
+                'both' => 'Un code de verification vous a ete envoye par email et par téléphone.',
+                default => 'Un code de verification vous a ete envoye.'
+            };
+        } else {
+            $message = 'Code de verification (affiché ci-dessous)';
+        }
 
         return redirect()->route('verification.form')->with('message', $message);
     }
@@ -190,7 +195,7 @@ class AuthController extends Controller
             $user = Auth::user();
 
             if ($user->verification_code && !$user->email_verified_at && !$user->phone_verified_at) {
-                return redirect()->route('verification.form');
+                return redirect()->route('verification.form')->with('message', 'Veuillez verifier votre compte avant de continuer.');
             }
 
             return $this->redirectByRole($user->role);
@@ -208,14 +213,15 @@ class AuthController extends Controller
         $user->verification_code = $code;
         $user->save();
 
+        $sent = false;
         try {
-            Mail::to($user->email)->send(new VerificationCode($code, $user->name));
+            Mail::mailer('smtp')->to($user->email)->send(new VerificationCode($code, $user->name));
+            $sent = true;
         } catch (\Exception $e) {
             Log::error('Echec renvoi email verification: '.$e->getMessage());
-            return back()->withErrors(['email' => 'Erreur lors de l\'envoi de l\'email. Veuillez réessayer.']);
         }
 
-        return back()->with('message', 'Un nouveau code vous a ete envoye.');
+        return back()->with('message', $sent ? 'Un nouveau code vous a ete envoye.' : 'Code actualise (voir ci-dessous).');
     }
 
     public function logout(Request $request)

@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('verification_channel')->nullable()->after('verification_code');
+            $table->string('verification_channel')->nullable();
         });
     }
 

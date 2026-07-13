@@ -115,6 +115,21 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])
     return $sent ? 'Email envoye avec succes' : 'ERREUR: Echec envoi';
 })->name('debug.mail');
 
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->get('/debug/env', function () {
+    $railwayVars = ['RAILWAY_API_TOKEN', 'RAILWAY_PROJECT_ID', 'RAILWAY_ENVIRONMENT_ID', 'RAILWAY_SERVICE_ID', 'RAILWAY_DEPLOYMENT_ID', 'BREVO_API_KEY', 'MAIL_MAILER', 'MAIL_FROM_ADDRESS'];
+    $output = '';
+    foreach ($railwayVars as $v) {
+        $val = env($v);
+        if ($v === 'RAILWAY_API_TOKEN' && $val) {
+            $val = substr($val, 0, 10) . '...';
+        }
+        $output .= "$v = " . ($val ?: '(not set)') . "\n";
+    }
+    $output .= "\nAPP_ENV = " . env('APP_ENV') . "\n";
+    $output .= "All env keys:\n" . implode("\n", array_keys($_ENV));
+    return '<pre>' . htmlspecialchars($output) . '</pre>';
+})->name('debug.env');
+
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->get('/debug/setup-railway-env', function (\Illuminate\Http\Request $request) {
     $artisan = app()->make(Illuminate\Contracts\Console\Kernel::class);
     $key = $request->query('key', '');

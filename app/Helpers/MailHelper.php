@@ -9,6 +9,12 @@ class MailHelper
     {
         $apiKey = env('BREVO_API_KEY');
         if (!$apiKey) {
+            $file = storage_path('app/brevo_key.txt');
+            if (file_exists($file)) {
+                $apiKey = trim(file_get_contents($file));
+            }
+        }
+        if (!$apiKey) {
             Log::error('BREVO_API_KEY not set');
             return false;
         }

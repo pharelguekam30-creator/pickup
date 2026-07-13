@@ -130,12 +130,15 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])
     return '<pre>' . htmlspecialchars($output) . '</pre>';
 })->name('debug.env');
 
-Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->get('/debug/setup-railway-env', function (\Illuminate\Http\Request $request) {
-    $artisan = app()->make(Illuminate\Contracts\Console\Kernel::class);
-    $key = $request->query('key', '');
-    $exitCode = $artisan->call('railway:setup-env', ['--brevo-key' => $key]);
-    return '<pre>' . $artisan->output() . '</pre>';
-})->name('debug.setup-railway');
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->match(['get', 'post'], '/admin/brevo-key', function (\Illuminate\Http\Request $request) {
+    if ($request->isMethod('post')) {
+        $key = $request->input('key', '');
+        file_put_contents(storage_path('app/brevo_key.txt'), $key);
+        return redirect()->back()->with('success', 'Cle Brevo enregistree.');
+    }
+    $current = file_exists(storage_path('app/brevo_key.txt')) ? file_get_contents(storage_path('app/brevo_key.txt')) : '(non definie)';
+    return '<form method=post><input type=hidden name=_token value="'.csrf_token().'"><label>Cle API Brevo :</label><br><input type=text name=key value="'.htmlspecialchars($current).'" size=60><br><br><button type=submit>Enregistrer</button></form>';
+})->name('admin.brevo-key');
 
 Route::get('/choose-role', function () {
     return view('auth.choose-role');

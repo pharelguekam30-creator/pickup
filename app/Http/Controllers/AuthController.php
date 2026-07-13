@@ -97,6 +97,19 @@ class AuthController extends Controller
         }
 
         Auth::login($user);
+
+        if ($emailSent) {
+            return redirect()->route('verification.form')->with('message', match ($channel) {
+                'email' => 'Un code de verification vous a ete envoye par email.',
+                'phone' => 'Un code de verification vous a ete envoye par téléphone.',
+                'both' => 'Un code de verification vous a ete envoye par email et par téléphone.',
+                default => 'Un code de verification vous a ete envoye.'
+            });
+        }
+
+        $user->email_verified_at = now();
+        $user->verification_code = null;
+        $user->save();
         return $this->redirectByRole($user->role)->with('success', 'Compte cree avec succes.');
     }
 

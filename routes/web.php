@@ -25,6 +25,17 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.su
 
 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::middleware(['auth'])->get('/debug/test-mail', function () {
+    try {
+        \Illuminate\Support\Facades\Mail::mailer('smtp')->raw('Test email from PICKUP Railway', function ($msg) {
+            $msg->to(auth()->user()->email)->subject('SMTP Test');
+        });
+        return 'Email sent successfully to ' . auth()->user()->email;
+    } catch (\Exception $e) {
+        return 'ERROR: ' . $e->getMessage() . "\n" . $e->getTraceAsString();
+    }
+});
+
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':menagere'])->group(function () {
     Route::get('/menagere/dashboard', [DashboardController::class, 'menagere'])->name('menagere.dashboard');
     Route::get('reservations/create', [ReservationController::class, 'create'])->name('reservations.create');

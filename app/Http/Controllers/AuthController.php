@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
-use App\Mail\VerificationCode;
+use App\Helpers\MailHelper;
 
 class AuthController extends Controller
 {
@@ -84,16 +84,11 @@ class AuthController extends Controller
         }
 
         if ($channel === 'email' || $channel === 'both') {
-            try {
-                Mail::mailer('smtp')->to($user->email)->send(new VerificationCode($code, $user->name));
-            } catch (\Exception $e) {
-                Log::error('Echec envoi email verification: '.$e->getMessage());
+            $body = "Bonjour {$user->name},\n\nVotre code de verification est : $code\n\nCe code expire dans 10 minutes.\n\nCordialement,\nL'equipe PICKUP";
+            $sent = MailHelper::sendEmail($user->email, 'Code de verification PICKUP', $body);
+            if (!$sent) {
                 $user->delete();
-                $msg = 'Impossible d\'envoyer le code de verification. Veuillez reessayer.';
-                if (str_contains($e->getMessage(), 'Connection') || str_contains($e->getMessage(), 'timeout') || str_contains($e->getMessage(), 'refused')) {
-                    $msg = 'Echec d\'envoi : verifiez votre connexion internet.';
-                }
-                return back()->withErrors(['email' => $msg])->withInput();
+                return back()->withErrors(['email' => 'Echec d\'envoi : verifiez votre connexion internet.'])->withInput();
             }
         }
 
@@ -205,13 +200,8 @@ class AuthController extends Controller
         $user->verification_code = $code;
         $user->save();
 
-        $sent = false;
-        try {
-            Mail::mailer('smtp')->to($user->email)->send(new VerificationCode($code, $user->name));
-            $sent = true;
-        } catch (\Exception $e) {
-            Log::error('Echec renvoi email verification: '.$e->getMessage());
-        }
+        $body = "Bonjour {$user->name},\n\nVotre nouveau code de verification est : $code\n\nCe code expire dans 10 minutes.\n\nCordialement,\nL'equipe PICKUP";
+        $sent = MailHelper::sendEmail($user->email, 'Code de verification PICKUP', $body);
 
         if ($sent) {
             return back()->with('message', 'Un nouveau code vous a ete envoye par email.');
@@ -221,10 +211,7 @@ class AuthController extends Controller
         $user->email_verified_at = now();
         $user->verification_code = null;
         $user->save();
-        if ($e && (str_contains($e->getMessage(), 'Connection') || str_contains($e->getMessage(), 'timeout') || str_contains($e->getMessage(), 'refused'))) {
-            return $this->redirectByRole($user->role)->with('success', 'Verification automatique (envoi impossible).');
-        }
-        return $this->redirectByRole($user->role)->with('success', 'Verification automatique (erreur technique).');
+        return $this->redirectByRole($user->role)->with('success', 'Verification automatique (envoi impossible).');
     }
 
     public function logout(Request $request)

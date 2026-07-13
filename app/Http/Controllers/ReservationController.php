@@ -71,7 +71,7 @@ class ReservationController extends Controller
         $reservation = Reservation::create($data);
 
         try {
-            $vidangeur->notify(new NouvelleDemandeNotification($reservation));
+            (new NouvelleDemandeNotification($reservation))->send();
         } catch (\Exception $e) {
             Log::error('Echec notification: '.$e->getMessage());
         }

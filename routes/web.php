@@ -27,12 +27,10 @@ Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->nam
 
 Route::middleware(['auth'])->get('/debug/test-mail', function () {
     try {
-        \Illuminate\Support\Facades\Mail::mailer('smtp')->raw('Test email from PICKUP Railway', function ($msg) {
-            $msg->to(auth()->user()->email)->subject('SMTP Test');
-        });
-        return 'Email sent successfully to ' . auth()->user()->email;
+        $sent = \App\Helpers\MailHelper::sendEmail(auth()->user()->email, 'Test PICKUP Railway', 'Ceci est un email de test depuis PICKUP (Railway).');
+        return $sent ? 'Email envoye avec succes a ' . auth()->user()->email : 'ERREUR: Echec envoi email';
     } catch (\Exception $e) {
-        return 'ERROR: ' . $e->getMessage() . "\n" . $e->getTraceAsString();
+        return 'ERROR: ' . $e->getMessage();
     }
 });
 
@@ -113,18 +111,16 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->get('/debug/mail', function () {
-    $user = auth()->user();
-    try {
-        \Illuminate\Support\Facades\Mail::mailer('smtp')->to($user->email)->send(new \App\Mail\VerificationCode('123456', $user->name));
-        return 'Email envoye avec succes a '.$user->email;
-    } catch (\Exception $e) {
-        $msg = $e->getMessage();
-        if (str_contains($msg, 'php_network_getaddresses') || str_contains($msg, 'Operation timed out') || str_contains($msg, 'Connection refused') || str_contains($msg, 'connection refused')) {
-            $msg = 'Echec d\'envoi : verifiez votre connexion internet.';
-        }
-        return 'ERREUR: '.$msg;
-    }
+    $sent = \App\Helpers\MailHelper::sendEmail(auth()->user()->email, 'Test PICKUP API', 'Test via API Brevo');
+    return $sent ? 'Email envoye avec succes' : 'ERREUR: Echec envoi';
 })->name('debug.mail');
+
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->get('/debug/setup-railway-env', function (\Illuminate\Http\Request $request) {
+    $artisan = app()->make(Illuminate\Contracts\Console\Kernel::class);
+    $key = $request->query('key', '');
+    $exitCode = $artisan->call('railway:setup-env', ['--brevo-key' => $key]);
+    return '<pre>' . $artisan->output() . '</pre>';
+})->name('debug.setup-railway');
 
 Route::get('/choose-role', function () {
     return view('auth.choose-role');

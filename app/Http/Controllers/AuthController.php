@@ -83,34 +83,28 @@ class AuthController extends Controller
             $user->save();
         }
 
-        $emailSent = false;
         if ($channel === 'email' || $channel === 'both') {
             try {
                 Mail::mailer('smtp')->to($user->email)->send(new VerificationCode($code, $user->name));
-                $emailSent = true;
             } catch (\Exception $e) {
                 Log::error('Echec envoi email verification: '.$e->getMessage());
+                $user->delete();
+                $msg = 'Impossible d\'envoyer le code de verification. Veuillez reessayer.';
                 if (str_contains($e->getMessage(), 'Connection') || str_contains($e->getMessage(), 'timeout') || str_contains($e->getMessage(), 'refused')) {
-                    $message = 'Echec d\'envoi : verifiez votre connexion internet.';
+                    $msg = 'Echec d\'envoi : verifiez votre connexion internet.';
                 }
+                return back()->withErrors(['email' => $msg])->withInput();
             }
         }
 
         Auth::login($user);
 
-        if ($emailSent) {
-            return redirect()->route('verification.form')->with('message', match ($channel) {
-                'email' => 'Un code de verification vous a ete envoye par email.',
-                'phone' => 'Un code de verification vous a ete envoye par téléphone.',
-                'both' => 'Un code de verification vous a ete envoye par email et par téléphone.',
-                default => 'Un code de verification vous a ete envoye.'
-            });
-        }
-
-        $user->email_verified_at = now();
-        $user->verification_code = null;
-        $user->save();
-        return $this->redirectByRole($user->role)->with('success', 'Compte cree avec succes.');
+        return redirect()->route('verification.form')->with('message', match ($channel) {
+            'email' => 'Un code de verification vous a ete envoye par email.',
+            'phone' => 'Un code de verification vous a ete envoye par téléphone.',
+            'both' => 'Un code de verification vous a ete envoye par email et par téléphone.',
+            default => 'Un code de verification vous a ete envoye.'
+        });
     }
 
     private $cityBounds = [

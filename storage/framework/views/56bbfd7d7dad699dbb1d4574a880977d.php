@@ -12,13 +12,15 @@ body { margin:0; padding:20px; font-family:sans-serif; background:#f3f4f6; }
 </head>
 <body>
 <h2 style="margin-bottom:1rem;">Vidangeurs</h2>
+<div id="mapTileError" style="display:none;padding:.7rem;background:#fef2f2;border:1px solid #fca5a5;border-radius:.5rem;color:#991b1b;text-align:center;font-size:.9rem;margin-bottom:.5rem;">&#9888; Verifiez votre connexion internet.</div>
 <div id="map"></div>
 <script src="/leaflet/leaflet.min.js"></script>
 <script>
 var data = <?php echo json_encode($vidangeurs, 15, 512) ?>;
 var role = <?php echo json_encode(auth()->check() ? auth()->user()->role : null, 15, 512) ?>;
 var map = L.map('map').setView([4.05, 11.5], 6);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+tileLayer.on('tileerror', function() { if (!window._tileError) { window._tileError = true; document.getElementById('mapTileError').style.display = 'block'; } });
 for (var i = 0; i < data.length; i++) {
     var v = data[i];
     if (v.latitude) {

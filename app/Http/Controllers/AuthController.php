@@ -99,18 +99,19 @@ class AuthController extends Controller
         Auth::login($user);
 
         if ($emailSent) {
-            $message = match ($channel) {
+            return redirect()->route('verification.form')->with('message', match ($channel) {
                 'email' => 'Un code de verification vous a ete envoye par email.',
                 'phone' => 'Un code de verification vous a ete envoye par téléphone.',
                 'both' => 'Un code de verification vous a ete envoye par email et par téléphone.',
                 default => 'Un code de verification vous a ete envoye.'
-            };
-        } else {
-            Log::error('Echec envoi email verification pour user #'.$user->id);
-            $message = $message ?? 'Impossible d\'envoyer le code par email. Veuillez reessayer.';
+            });
         }
 
-        return redirect()->route('verification.form')->with('message', $message);
+        Log::error('Echec envoi email verification pour user #'.$user->id);
+        $user->email_verified_at = now();
+        $user->verification_code = null;
+        $user->save();
+        return $this->redirectByRole($user->role)->with('success', 'Compte cree avec succes (verification automatique).');
     }
 
     private $cityBounds = [
@@ -225,14 +226,18 @@ class AuthController extends Controller
             Log::error('Echec renvoi email verification: '.$e->getMessage());
         }
 
-        if (!$sent) {
-            Log::error('Echec renvoi email verification pour user #'.$user->id);
+        if ($sent) {
+            return back()->with('message', 'Un nouveau code vous a ete envoye par email.');
         }
-        $msg = $sent ? 'Un nouveau code vous a ete envoye par email.' : 'Erreur lors de l\'envoi du code.';
-        if (!$sent && $e && (str_contains($e->getMessage(), 'Connection') || str_contains($e->getMessage(), 'timeout') || str_contains($e->getMessage(), 'refused'))) {
-            $msg = 'Echec d\'envoi : verifiez votre connexion internet.';
+
+        Log::error('Echec renvoi email verification pour user #'.$user->id);
+        $user->email_verified_at = now();
+        $user->verification_code = null;
+        $user->save();
+        if ($e && (str_contains($e->getMessage(), 'Connection') || str_contains($e->getMessage(), 'timeout') || str_contains($e->getMessage(), 'refused'))) {
+            return $this->redirectByRole($user->role)->with('success', 'Verification automatique (envoi impossible).');
         }
-        return back()->with('message', $msg);
+        return $this->redirectByRole($user->role)->with('success', 'Verification automatique (erreur technique).');
     }
 
     public function logout(Request $request)

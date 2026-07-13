@@ -5,17 +5,25 @@ use Illuminate\Support\Facades\Log;
 
 class MailHelper
 {
-    public static function sendEmail($to, $subject, $body)
+    public static function getApiKey()
     {
-        $apiKey = env('BREVO_API_KEY');
-        if (!$apiKey) {
+        $key = env('BREVO_API_KEY');
+        if (!$key) {
             $file = storage_path('app/brevo_key.txt');
             if (file_exists($file)) {
-                $apiKey = trim(file_get_contents($file));
+                $key = trim(file_get_contents($file));
             }
         }
+        return $key ?: null;
+    }
+
+    public static function sendEmail($to, $subject, $body, &$log = null)
+    {
+        $apiKey = self::getApiKey();
         if (!$apiKey) {
-            Log::error('BREVO_API_KEY not set');
+            $msg = 'BREVO_API_KEY not set';
+            Log::error($msg);
+            if ($log !== null) $log = $msg;
             return false;
         }
 
@@ -27,6 +35,12 @@ class MailHelper
         ];
 
         try {
+            if (!function_exists('curl_init')) {
+                $msg = 'curl not available';
+                Log::error($msg);
+                if ($log !== null) $log = $msg;
+                return false;
+            }
             $ch = curl_init('https://api.brevo.com/v3/smtp/email');
             curl_setopt_array($ch, [
                 CURLOPT_POST => true,
@@ -37,20 +51,28 @@ class MailHelper
                 CURLOPT_POSTFIELDS => json_encode($data),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_TIMEOUT => 15,
+                CURLOPT_SSL_VERIFYPEER => true,
             ]);
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
             curl_close($ch);
 
             if ($httpCode >= 200 && $httpCode < 300) {
                 Log::info("Email sent to $to via Brevo API");
+                if ($log !== null) $log = "HTTP $httpCode OK";
                 return true;
             }
 
-            Log::error("Brevo API error ($httpCode): $response");
+            $msg = "Brevo API error ($httpCode): $response";
+            if ($error) $msg .= " | curl: $error";
+            Log::error($msg);
+            if ($log !== null) $log = $msg;
             return false;
         } catch (\Exception $e) {
-            Log::error('Brevo API exception: ' . $e->getMessage());
+            $msg = 'Brevo API exception: ' . $e->getMessage();
+            Log::error($msg);
+            if ($log !== null) $log = $msg;
             return false;
         }
     }

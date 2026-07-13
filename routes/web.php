@@ -111,8 +111,10 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->get('/debug/mail', function () {
-    $sent = \App\Helpers\MailHelper::sendEmail(auth()->user()->email, 'Test PICKUP API', 'Test via API Brevo');
-    return $sent ? 'Email envoye avec succes' : 'ERREUR: Echec envoi';
+    $key = \App\Helpers\MailHelper::getApiKey();
+    $log = '';
+    $sent = \App\Helpers\MailHelper::sendEmail(auth()->user()->email, 'Test PICKUP API', 'Test via API Brevo', $log);
+    return '<pre>Key defined: ' . ($key ? 'OUI (longueur: '.strlen($key).')' : 'NON') . "\nResult: " . ($sent ? 'OK' : "ECHEC\nLog: $log") . '</pre>';
 })->name('debug.mail');
 
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->get('/debug/env', function () {

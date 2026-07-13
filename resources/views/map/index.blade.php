@@ -26,10 +26,11 @@
     const mapWrapper = document.getElementById('mapWrapper');
     let map = L.map('map', { scrollWheelZoom: false }).setView([4.05, 11.5], 6);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    var tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; CartoDB',
         maxZoom: 19,
     }).addTo(map);
+    tileLayer.on('tileerror', function() { if (!window._tileErrorShown) { window._tileErrorShown = true; document.getElementById('mapTileError').style.display = 'block'; } });
 
     const greenIcon = L.divIcon({
         className: '',
@@ -154,6 +155,7 @@
     </div>
 
     <div id="mapWrapper">
+        <div id="mapTileError" style="display:none;padding:.7rem;background:#fef2f2;border:1px solid #fca5a5;border-radius:.5rem;color:#991b1b;text-align:center;font-size:.9rem;">&#9888; Verifiez votre connexion internet.</div>
         <div id="map"></div>
         <div id="mapOverflow" style="width:200%;height:200%;pointer-events:none;"></div>
     </div>

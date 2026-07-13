@@ -90,6 +90,9 @@ class AuthController extends Controller
                 $emailSent = true;
             } catch (\Exception $e) {
                 Log::error('Echec envoi email verification: '.$e->getMessage());
+                if (str_contains($e->getMessage(), 'Connection') || str_contains($e->getMessage(), 'timeout') || str_contains($e->getMessage(), 'refused')) {
+                    $message = 'Echec d\'envoi : verifiez votre connexion internet.';
+                }
             }
         }
 
@@ -103,7 +106,8 @@ class AuthController extends Controller
                 default => 'Un code de verification vous a ete envoye.'
             };
         } else {
-            $message = 'Code de verification (affiché ci-dessous)';
+            Log::error('Echec envoi email verification pour user #'.$user->id);
+            $message = $message ?? 'Impossible d\'envoyer le code par email. Veuillez reessayer.';
         }
 
         return redirect()->route('verification.form')->with('message', $message);
@@ -221,7 +225,14 @@ class AuthController extends Controller
             Log::error('Echec renvoi email verification: '.$e->getMessage());
         }
 
-        return back()->with('message', $sent ? 'Un nouveau code vous a ete envoye.' : 'Code actualise (voir ci-dessous).');
+        if (!$sent) {
+            Log::error('Echec renvoi email verification pour user #'.$user->id);
+        }
+        $msg = $sent ? 'Un nouveau code vous a ete envoye par email.' : 'Erreur lors de l\'envoi du code.';
+        if (!$sent && $e && (str_contains($e->getMessage(), 'Connection') || str_contains($e->getMessage(), 'timeout') || str_contains($e->getMessage(), 'refused'))) {
+            $msg = 'Echec d\'envoi : verifiez votre connexion internet.';
+        }
+        return back()->with('message', $msg);
     }
 
     public function logout(Request $request)

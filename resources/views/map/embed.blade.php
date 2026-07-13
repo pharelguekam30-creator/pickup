@@ -24,6 +24,7 @@ body { margin:0; padding:20px; font-family:sans-serif; background:#f3f4f6; }
     </button>
 </div>
 
+<div id="mapTileError" style="display:none;padding:.7rem;background:#fef2f2;border:1px solid #fca5a5;border-radius:.5rem;color:#991b1b;text-align:center;font-size:.9rem;margin-bottom:.5rem;">&#9888; Verifiez votre connexion internet.</div>
 <div id="map" style="height:520px;width:100%;border-radius:1rem;border:1px solid #e5e7eb;background:#e8e8e8;"></div>
 
 <div style="margin-top:1.5rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;">
@@ -53,10 +54,11 @@ body { margin:0; padding:20px; font-family:sans-serif; background:#f3f4f6; }
 const vidangeurs = @json($vidangeurs);
 const userRole = {{ json_encode(auth()->check() ? auth()->user()->role : null) }};
 const map = L.map('map').setView([4.05, 11.5], 6);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap',
     maxZoom: 18,
 }).addTo(map);
+tileLayer.on('tileerror', function() { if (!window._tileError) { window._tileError = true; document.getElementById('mapTileError').style.display = 'block'; } });
 
 const greenIcon = L.divIcon({
     className: '',

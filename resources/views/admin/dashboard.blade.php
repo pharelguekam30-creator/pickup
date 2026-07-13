@@ -1,5 +1,15 @@
 @extends('layouts.app')
 
+@section('sidebar')
+    <a href="{{ route('dashboard') }}" class="block px-4 py-2 rounded hover:bg-indigo-500 transition">Dashboard</a>
+    <a href="{{ route('users.index') }}" class="block px-4 py-2 rounded hover:bg-indigo-500 transition">Utilisateurs</a>
+    <a href="{{ route('services.index') }}" class="block px-4 py-2 rounded hover:bg-indigo-500 transition">Services</a>
+    <a href="{{ route('admin.plans.index') }}" class="block px-4 py-2 rounded hover:bg-indigo-500 transition">Plans de collecte</a>
+    <a href="{{ route('admin.subscriptions') }}" class="block px-4 py-2 rounded hover:bg-indigo-500 transition">Abonnements</a>
+    <a href="{{ route('reservations.index') }}" class="block px-4 py-2 rounded hover:bg-indigo-500 transition">Réservations</a>
+    <a href="{{ route('admin.stats') }}" class="block px-4 py-2 rounded hover:bg-indigo-500 transition">Statistiques</a>
+@endsection
+
 @section('content')
 <div class="dashboard-wrapper">
     @if (session('success'))
@@ -23,9 +33,14 @@
             <a href="{{ route('services.index') }}" style="font-size:.85rem;color:#2563eb;">Gerer</a>
         </div>
         <div style="background:#fff;padding:1rem;border-radius:1rem;box-shadow:0 2px 8px #00000011;">
-            <p style="color:#94a3b8;font-size:.75rem;">Reservations</p>
+            <p style="color:#94a3b8;font-size:.75rem;">Réservations</p>
             <p style="font-size:1.8rem;font-weight:bold;color:#1e293b;">{{ \App\Models\Reservation::count() }}</p>
-            <a href="{{ route('reservations.index') }}" style="font-size:.85rem;color:#2563eb;">Gerer</a>
+            <a href="{{ route('reservations.index') }}" style="font-size:.85rem;color:#2563eb;">Gérer</a>
+        </div>
+        <div style="background:#fff;padding:1rem;border-radius:1rem;box-shadow:0 2px 8px #00000011;">
+            <p style="color:#94a3b8;font-size:.75rem;">Plans de collecte</p>
+            <p style="font-size:1.8rem;font-weight:bold;color:#1e293b;">{{ \App\Models\CollectionPlan::count() }}</p>
+            <a href="{{ route('admin.plans.index') }}" style="font-size:.85rem;color:#2563eb;">Gérer</a>
         </div>
         <div style="background:#ede9fe;padding:1rem;border-radius:1rem;box-shadow:0 2px 8px #00000011;border:2px solid #7c3aed;">
             <p style="color:#7c3aed;font-size:.75rem;font-weight:700;">A confirmer</p>

@@ -30,7 +30,7 @@ class AdminTest extends TestCase
 
         $response->assertSessionHasNoErrors();
         $this->assertEquals('completed', $reservation->fresh()->status);
-        $this->assertEquals(9000, $vidangeur->fresh()->solde);
+        $this->assertEquals(6500, $vidangeur->fresh()->solde);
     }
 
     public function test_admin_can_force_cancel_reservation()

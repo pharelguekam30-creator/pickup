@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') - Pickup</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png.jpeg') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com" onerror="document.getElementById('tailwind-fallback').removeAttribute('media')"></script>
+    <style id="tailwind-fallback" media="all">
+        .container{max-width:1200px;margin:0 auto;padding:0 1rem}.flex{display:flex}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-between{justify-content:space-between}.text-center{text-align:center}.w-full{width:100%}.hidden{display:none}.inline{display:inline}.block{display:block}.inline-block{display:inline-block}.rounded{border-radius:.5rem}.px-4{padding-left:1rem;padding-right:1rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.px-3{padding-left:.75rem;padding-right:.75rem}.py-1{padding-top:.25rem;padding-bottom:.25rem}.p-4{padding:1rem}.m-0{margin:0}.mt-4{margin-top:1rem}.mb-4{margin-bottom:1rem}.gap-2{gap:.5rem}.gap-4{gap:1rem}.text-white{color:#fff}.text-sm{font-size:.875rem}.text-lg{font-size:1.125rem}.font-bold{font-weight:700}.font-semibold{font-weight:600}.hover\:bg-gray-700:hover{background:#374151}.hover\:bg-blue-700:hover{background:#1d4ed8}.hover\:bg-green-700:hover{background:#15803d}.transition{transition:all .2s}.border-b{border-bottom:1px solid #e5e7eb}.bg-gray-50{background:#f9fafb}.bg-gray-600{background:#4b5563}.bg-green-600{background:#16a34a}.bg-blue-600{background:#2563eb}.bg-red-600{background:#dc2626}
+    </style>
     <link rel="stylesheet" href="/fontawesome/all.min.css">
     @stack('styles')
     <style>
@@ -501,11 +504,20 @@
         @endif
     </main>
 
+    <script>
+    window.globalInternetError = function(containerId) {
+        var el = document.getElementById(containerId);
+        if (el) {
+            el.innerHTML = '<div style="padding:1rem;background:#fef2f2;border:1px solid #fca5a5;border-radius:.5rem;color:#991b1b;text-align:center;">' +
+                '<span style="font-size:1.25rem;">&#9888;</span> Verifiez votre connexion internet.</div>';
+        }
+    };
+    </script>
     @stack('scripts')
 
     <!-- FOOTER -->
     <footer>
-        <p>&copy; 2025 Pickup. Tous droits réservés.</p>
+        <p>&copy; {{ date('Y') }} Pickup. Tous droits réservés.</p>
     </footer>
 </body>
 </html>

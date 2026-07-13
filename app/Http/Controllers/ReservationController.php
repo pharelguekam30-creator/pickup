@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Notifications\NouvelleDemandeNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReservationController extends Controller
 {
@@ -44,6 +45,15 @@ class ReservationController extends Controller
             'time' => 'required'
         ]);
 
+        $client = auth()->user();
+        $service = \App\Models\Service::find($request->service_id);
+        if (!$service) {
+            return back()->withErrors(['service_id' => 'Service introuvable.'])->withInput();
+        }
+        if (($client->solde ?? 0) < ($service->price ?? 0)) {
+            return back()->withErrors(['solde' => 'Solde insuffisant. Votre solde est de ' . number_format($client->solde ?? 0, 0, ',', ' ') . ' FCFA, le service coute ' . number_format($service->price, 0, ',', ' ') . ' FCFA.'])->withInput();
+        }
+
         $vidangeur = User::where('id', $request->user_id)->where('role', 'vidangeur')->first();
         if (!$vidangeur) {
             return back()->withErrors(['user_id' => 'Le vidangeur sélectionné est invalide ou indisponible.'])->withInput();
@@ -60,7 +70,11 @@ class ReservationController extends Controller
 
         $reservation = Reservation::create($data);
 
-        $vidangeur->notify(new NouvelleDemandeNotification($reservation));
+        try {
+            $vidangeur->notify(new NouvelleDemandeNotification($reservation));
+        } catch (\Exception $e) {
+            Log::error('Echec notification: '.$e->getMessage());
+        }
 
         return redirect()->route('menagere.dashboard')->with('success', 'Demande d’intervention envoyée au vidangeur et en attente de confirmation.');
     }
@@ -94,6 +108,8 @@ class ReservationController extends Controller
     public function accept($id)
     {
         $reservation = Reservation::findOrFail($id);
+        if ($reservation->user_id !== auth()->id()) abort(403);
+        if ($reservation->status !== 'pending') return back()->with('error', 'Cette intervention ne peut plus être acceptée.');
         $reservation->status = 'accepted';
         $reservation->save();
 
@@ -103,6 +119,8 @@ class ReservationController extends Controller
     public function cancel($id)
     {
         $reservation = Reservation::findOrFail($id);
+        if ($reservation->user_id !== auth()->id()) abort(403);
+        if (!in_array($reservation->status, ['pending', 'accepted'])) return back()->with('error', 'Cette intervention ne peut plus être annulée.');
         $reservation->status = 'canceled';
         $reservation->save();
 
@@ -119,7 +137,7 @@ class ReservationController extends Controller
         if (!$client || !$vidangeur) return 'Client ou vidangeur introuvable.';
         if (($client->solde ?? 0) < $montant) return 'Le client n\'a pas assez de solde.';
 
-        $commission = round($montant * 0.10, 2);
+        $commission = round($montant * 0.35, 2);
         $net = $montant - $commission;
 
         $solde_client_avant = $client->solde;
@@ -161,7 +179,7 @@ class ReservationController extends Controller
                 'montant' => -$commission,
                 'solde_avant' => $vidangeur->solde,
                 'solde_apres' => $vidangeur->solde,
-                'description' => 'Commission plateforme 10% sur ' . $reservation->service->name,
+                'description' => 'Commission plateforme 35% sur ' . $reservation->service->name,
                 'reservation_id' => $reservation->id,
                 'methode' => 'interne',
                 'statut' => 'completed',
@@ -179,7 +197,7 @@ class ReservationController extends Controller
                     'montant' => $commission,
                     'solde_avant' => $solde_admin_avant,
                     'solde_apres' => $admin->solde,
-                    'description' => 'Commission 10% sur intervention #' . $reservation->id . ' (' . $reservation->service->name . ')',
+                    'description' => 'Commission 35% sur intervention #' . $reservation->id . ' (' . $reservation->service->name . ')',
                     'reservation_id' => $reservation->id,
                     'methode' => 'interne',
                     'statut' => 'completed',
@@ -197,6 +215,7 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::with(['service', 'client', 'user'])->findOrFail($id);
 
+        if ($reservation->user_id !== auth()->id()) abort(403);
         if ($reservation->status !== 'accepted') {
             return back()->with('error', 'L\'intervention doit d\'abord être acceptée.');
         }
@@ -271,3 +290,4 @@ class ReservationController extends Controller
         return back()->with('success', 'Intervention annulée par l\'administrateur.');
     }
 }
+

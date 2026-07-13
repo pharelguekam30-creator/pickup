@@ -92,6 +92,7 @@
             </div>
             <div style="grid-column:1/-1;">
                 <label style="display:block;font-weight:600;color:#374151;margin-bottom:.3rem;">Position sur la carte</label>
+                <div id="mapTileError" style="display:none;padding:.5rem;background:#fef2f2;border:1px solid #fca5a5;border-radius:.5rem;color:#991b1b;text-align:center;font-size:.85rem;margin-bottom:.5rem;">&#9888; Verifiez votre connexion internet.</div>
                 <div id="map" style="height:300px;border-radius:10px;border:2px solid #cbd5e1;margin-bottom:.5rem;"></div>
                 <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude', $user->latitude) }}">
                 <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', $user->longitude) }}">
@@ -108,9 +109,10 @@
             var lat = {{ $user->latitude ?? 4.0441 }};
             var lng = {{ $user->longitude ?? 9.7299 }};
             var map = L.map('map').setView([lat, lng], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '\u00a9 OpenStreetMap'
             }).addTo(map);
+            tileLayer.on('tileerror', function() { if (!window._tileError) { window._tileError = true; document.getElementById('mapTileError').style.display = 'block'; } });
             var marker = L.marker([lat, lng], {draggable: true}).addTo(map);
             marker.on('dragend', function () {
                 var pos = marker.getLatLng();

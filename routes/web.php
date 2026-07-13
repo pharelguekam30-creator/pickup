@@ -101,16 +101,67 @@ Route::middleware('auth')->group(function () {
     Route::post('/verification/resend', [AuthController::class, 'resendCode'])->name('verification.resend');
 });
 
-Route::middleware('auth')->get('/debug/mail', function () {
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->get('/debug/mail', function () {
     $user = auth()->user();
     try {
         \Illuminate\Support\Facades\Mail::mailer('smtp')->to($user->email)->send(new \App\Mail\VerificationCode('123456', $user->name));
         return 'Email envoye avec succes a '.$user->email;
     } catch (\Exception $e) {
-        return 'ERREUR: '.$e->getMessage();
+        $msg = $e->getMessage();
+        if (str_contains($msg, 'php_network_getaddresses') || str_contains($msg, 'Operation timed out') || str_contains($msg, 'Connection refused') || str_contains($msg, 'connection refused')) {
+            $msg = 'Echec d\'envoi : verifiez votre connexion internet.';
+        }
+        return 'ERREUR: '.$msg;
     }
 })->name('debug.mail');
 
 Route::get('/choose-role', function () {
     return view('auth.choose-role');
 })->name('choix.role');
+
+// Plans de collecte (public)
+Route::get('/plans', [\App\Http\Controllers\SubscriptionController::class, 'plans'])->name('subscriptions.plans');
+
+// Souscription (ménagère)
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':menagere'])->group(function () {
+    Route::get('/plans/{plan}/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'subscribeForm'])->name('subscriptions.subscribe.form');
+    Route::post('/subscriptions', [\App\Http\Controllers\SubscriptionController::class, 'subscribe'])->name('subscriptions.subscribe');
+    Route::get('/my-subscriptions', [\App\Http\Controllers\SubscriptionController::class, 'mySubscriptions'])->name('subscriptions.my');
+    Route::post('/subscriptions/{subscription}/cancel', [\App\Http\Controllers\SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
+});
+
+// Collectes d'abonnement (ménagère + vidangeur)
+Route::middleware('auth')->group(function () {
+    Route::get('/subscriptions/{subscription}/collections', [\App\Http\Controllers\SubscriptionController::class, 'myCollections'])->name('subscriptions.collections');
+});
+
+// Abonnements du vidangeur
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':vidangeur'])->group(function () {
+    Route::get('/vidangeur/abonnements', [\App\Http\Controllers\SubscriptionController::class, 'vidangeurSubscriptions'])->name('subscriptions.vidangeur');
+});
+
+// Compléter une collecte (vidangeur)
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':vidangeur'])->group(function () {
+    Route::post('/subscriptions/collections/{collection}/complete', [\App\Http\Controllers\SubscriptionController::class, 'completeCollection'])->name('subscriptions.collections.complete');
+    Route::post('/subscriptions/{subscription}/complete-month', [\App\Http\Controllers\SubscriptionController::class, 'completeMonth'])->name('subscriptions.month.complete');
+});
+
+// Confirmer le mois (ménagère)
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':menagere'])->group(function () {
+    Route::post('/subscriptions/{subscription}/confirm-month', [\App\Http\Controllers\SubscriptionController::class, 'confirmMonth'])->name('subscriptions.month.confirm');
+});
+
+// Admin CRUD plans
+Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->group(function () {
+    Route::resource('admin/plans', \App\Http\Controllers\Admin\PlanController::class)->except(['show'])->names([
+        'index' => 'admin.plans.index',
+        'create' => 'admin.plans.create',
+        'store' => 'admin.plans.store',
+        'edit' => 'admin.plans.edit',
+        'update' => 'admin.plans.update',
+        'destroy' => 'admin.plans.destroy',
+    ]);
+    Route::get('/admin/subscriptions', [\App\Http\Controllers\SubscriptionController::class, 'adminDisputes'])->name('admin.subscriptions');
+    Route::post('/admin/subscriptions/{subscription}/force-pay', [\App\Http\Controllers\SubscriptionController::class, 'adminForcePay'])->name('admin.subscriptions.force-pay');
+    Route::post('/admin/subscriptions/{subscription}/force-cancel-month', [\App\Http\Controllers\SubscriptionController::class, 'adminForceCancelMonth'])->name('admin.subscriptions.force-cancel-month');
+});

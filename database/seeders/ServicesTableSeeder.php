@@ -16,47 +16,47 @@ class ServicesTableSeeder extends Seeder
             [
                 'name' => 'Collecte de poubelles ménagères',
                 'description' => 'Ramassage régulier des déchets domestiques.',
-                'price' => 500,
+                'price' => 2000,
             ],
             [
                 'name' => 'Collecte de recyclables',
                 'description' => 'Ramassage du papier, plastique, verre et métal.',
-                'price' => 700,
+                'price' => 2500,
             ],
             [
                 'name' => 'Collecte de déchets organiques',
                 'description' => 'Ramassage et compostage des restes alimentaires.',
-                'price' => 600,
+                'price' => 2000,
             ],
             [
                 'name' => 'Collecte de déchets encombrants',
                 'description' => 'Ramassage des meubles et appareils encombrants.',
-                'price' => 1500,
+                'price' => 5000,
             ],
             [
                 'name' => 'Nettoyage de poubelles',
                 'description' => 'Lavage et désinfection des containers.',
-                'price' => 800,
+                'price' => 3000,
             ],
             [
                 'name' => 'Service express',
                 'description' => 'Collecte rapide sous 24 heures.',
-                'price' => 1200,
+                'price' => 4000,
             ],
             [
                 'name' => 'Service hebdomadaire',
                 'description' => 'Collecte régulière selon un calendrier fixe.',
-                'price' => 2000,
+                'price' => 6000,
             ],
             [
                 'name' => 'Collecte pour entreprises',
                 'description' => 'Service adapté aux bureaux et commerces.',
-                'price' => 2500,
+                'price' => 8000,
             ],
             [
                 'name' => 'Collecte écologique',
                 'description' => 'Tri avancé et orientation vers le recyclage ou le compostage.',
-                'price' => 1000,
+                'price' => 3500,
             ],
         ];
 

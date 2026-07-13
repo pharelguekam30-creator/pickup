@@ -84,21 +84,21 @@ class ReservationTest extends TestCase
         $this->assertEquals('completed', $reservation->status);
 
         $vidangeur->refresh();
-        $this->assertEquals(9000, $vidangeur->solde);
+        $this->assertEquals(6500, $vidangeur->solde);
 
         $admin->refresh();
-        $this->assertEquals(1000, $admin->solde);
+        $this->assertEquals(3500, $admin->solde);
 
         $this->assertDatabaseHas('transactions', [
             'reservation_id' => $reservation->id,
             'type' => 'paiement',
-            'montant' => 9000,
+            'montant' => 6500,
         ]);
 
         $this->assertDatabaseHas('transactions', [
             'reservation_id' => $reservation->id,
             'type' => 'commission',
-            'montant' => 1000,
+            'montant' => 3500,
         ]);
     }
 

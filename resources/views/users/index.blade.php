@@ -21,6 +21,7 @@
     <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
         <h2 class="text-2xl font-semibold mb-4 text-gray-800">Répartition des rôles</h2>
         <div class="w-full max-w-md mx-auto" style="height:320px;">
+            <div id="chartError" style="display:none;padding:.7rem;background:#fef2f2;border:1px solid #fca5a5;border-radius:.5rem;color:#991b1b;text-align:center;">&#9888; Verifiez votre connexion internet.</div>
             <canvas id="rolesChart"></canvas>
         </div>
     </div>
@@ -74,7 +75,7 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js" onerror="document.getElementById('chartError').style.display='block'"></script>
 <script>
     // Données pour le graphique
     const roleCounts = {
@@ -83,6 +84,7 @@
         admin: {{ $users->where('role', 'admin')->count() }}
     };
 
+    if (typeof Chart === 'undefined') { document.getElementById('chartError').style.display='block'; } else {
     const ctx = document.getElementById('rolesChart').getContext('2d');
     new Chart(ctx, {
         type: 'pie',
@@ -117,5 +119,6 @@
             }
         }
     });
+    }
 </script>
 @endsection

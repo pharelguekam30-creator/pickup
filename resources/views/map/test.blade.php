@@ -17,6 +17,7 @@ body { margin:0; padding:20px; font-family:sans-serif; background:#f3f4f6; }
 <p style="color:#64748b;margin-bottom:1rem;" id="status">Cliquez sur un marqueur pour voir les détails</p>
 <button onclick="locateMe()" style="margin-bottom:1rem;padding:.5rem 1rem;background:#16a34a;color:#fff;border:none;border-radius:.7rem;font-weight:bold;cursor:pointer;">Me localiser</button>
 
+<div id="mapTileError" style="display:none;padding:.7rem;background:#fef2f2;border:1px solid #fca5a5;border-radius:.5rem;color:#991b1b;text-align:center;font-size:.9rem;margin-bottom:.5rem;">&#9888; Verifiez votre connexion internet.</div>
 <div id="map"></div>
 
 <script src="/leaflet/leaflet.min.js"></script>
@@ -24,10 +25,11 @@ body { margin:0; padding:20px; font-family:sans-serif; background:#f3f4f6; }
 const vidangeurs = @json($vidangeurs);
 const userRole = {{ json_encode(auth()->check() ? auth()->user()->role : null) }};
 const map = L.map('map').setView([4.05, 11.5], 6);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '\u00a9 OpenStreetMap',
     maxZoom: 18,
 }).addTo(map);
+tileLayer.on('tileerror', function() { if (!window._tileError) { window._tileError = true; document.getElementById('mapTileError').style.display = 'block'; } });
 
 const markers = [];
 vidangeurs.forEach(v => {

@@ -7,7 +7,7 @@
 
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
         <h1 style="font-size:1.3rem;font-weight:bold;color:#1e3a8a;">Discussion #{{ $reservation->id }}</h1>
-        <a href="{{ route(auth()->user()->role . '.dashboard') }}" style="color:#2563eb;text-decoration:none;font-size:.9rem;">&larr; Retour</a>
+        <a href="{{ route(auth()->user()->role === 'admin' ? 'dashboard' : auth()->user()->role . '.dashboard') }}" style="color:#2563eb;text-decoration:none;font-size:.9rem;">&larr; Retour</a>
     </div>
 
     <div style="background:#fff;border-radius:1rem;box-shadow:0 2px 8px #00000011;padding:1.5rem;margin-bottom:1rem;">

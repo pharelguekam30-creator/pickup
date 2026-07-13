@@ -63,7 +63,8 @@ class DashboardController extends Controller
     // Dashboard Ménagère
     public function menagere()
     {
-        $reservations = Reservation::where('client_id', auth()->id())
+        $reservations = Reservation::with(['service', 'user'])
+            ->where('client_id', auth()->id())
             ->orderBy('reservation_date', 'desc')
             ->get();
 
@@ -89,7 +90,8 @@ class DashboardController extends Controller
     // Dashboard Vidangeur
     public function vidangeur()
     {
-        $interventions = Reservation::where('user_id', auth()->id())
+        $interventions = Reservation::with(['service', 'client'])
+            ->where('user_id', auth()->id())
             ->orderBy('reservation_date', 'desc')
             ->get();
 

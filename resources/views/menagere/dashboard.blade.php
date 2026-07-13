@@ -2,6 +2,14 @@
 
 @section('title', 'Dashboard Ménagère')
 
+@section('sidebar')
+    <a href="#" class="block px-4 py-2 rounded hover:bg-indigo-500 transition">Interventions</a>
+    <a href="{{ route('subscriptions.my') }}" class="block px-4 py-2 rounded hover:bg-indigo-500 transition">Abonnements</a>
+    <a href="{{ route('subscriptions.plans') }}" class="block px-4 py-2 rounded hover:bg-indigo-500 transition">Plans de collecte</a>
+    <a href="#" class="block px-4 py-2 rounded hover:bg-indigo-500 transition">Profil</a>
+    <a href="#" class="block px-4 py-2 rounded hover:bg-indigo-500 transition">Historique</a>
+@endsection
+
 @section('content')
 <div class="dashboard-wrapper">
     @if (session('success'))
@@ -15,7 +23,8 @@
         </div>
     @endif
 
-    <div style="display:flex;justify-content:flex-end;margin-bottom:2rem;">
+    <div style="display:flex;justify-content:flex-end;gap:1rem;margin-bottom:2rem;">
+        <a href="{{ route('subscriptions.plans') }}" style="font-size:1rem;padding:1rem 2rem;background:#7c3aed;color:#fff;border-radius:1.5rem;font-weight:bold;box-shadow:0 2px 8px #7c3aed33;">+ Abonnement collecte</a>
         <a href="{{ route('reservations.create') }}" style="font-size:1.2rem;padding:1rem 2.5rem;background:#2563eb;color:#fff;border-radius:1.5rem;font-weight:bold;box-shadow:0 2px 8px #2563eb33;">+ Nouvelle demande d'intervention</a>
     </div>
 
@@ -84,7 +93,7 @@
                             </td>
                             <td style="padding:.75rem .5rem;text-align:center;">
                                 @if($r->status === 'completed_vidangeur')
-                                    <form action="{{ route('reservations.confirm', $r->id) }}" method="POST" style="display:inline;">
+                                    <form action="{{ route('reservations.confirm', $r->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Confirmer la réception et effectuer le paiement de {{ number_format($r->service->price ?? 0, 0, ',', ' ') }} FCFA ?');">
                                         @csrf
                                         <button type="submit" style="padding:.4rem 1rem;background:#7c3aed;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
                                             Confirmer

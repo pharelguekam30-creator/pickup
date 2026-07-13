@@ -97,21 +97,7 @@ class AuthController extends Controller
         }
 
         Auth::login($user);
-
-        if ($emailSent) {
-            return redirect()->route('verification.form')->with('message', match ($channel) {
-                'email' => 'Un code de verification vous a ete envoye par email.',
-                'phone' => 'Un code de verification vous a ete envoye par téléphone.',
-                'both' => 'Un code de verification vous a ete envoye par email et par téléphone.',
-                default => 'Un code de verification vous a ete envoye.'
-            });
-        }
-
-        Log::error('Echec envoi email verification pour user #'.$user->id);
-        $user->email_verified_at = now();
-        $user->verification_code = null;
-        $user->save();
-        return $this->redirectByRole($user->role)->with('success', 'Compte cree avec succes (verification automatique).');
+        return $this->redirectByRole($user->role)->with('success', 'Compte cree avec succes.');
     }
 
     private $cityBounds = [
@@ -197,13 +183,7 @@ class AuthController extends Controller
 
         if(Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            $user = Auth::user();
-
-            if ($user->verification_code && !$user->email_verified_at && !$user->phone_verified_at) {
-                return redirect()->route('verification.form')->with('message', 'Veuillez verifier votre compte avant de continuer.');
-            }
-
-            return $this->redirectByRole($user->role);
+            return $this->redirectByRole(Auth::user()->role);
         }
 
         return back()->withErrors(['email' => 'Identifiants invalides']);

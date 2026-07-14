@@ -28,9 +28,9 @@
         @endforeach
     </div>
 
-    <form id="chatForm" style="display:flex;gap:.5rem;">
+    <form id="chatForm" style="display:flex;gap:.5rem;flex-wrap:wrap;">
         <input type="text" id="messageInput" placeholder="Votre message..." required
-               style="flex:1;padding:.8rem 1rem;border:1px solid #e2e8f0;border-radius:10px;font-size:.95rem;">
+               style="flex:1 1 200px;padding:.8rem 1rem;border:1px solid #e2e8f0;border-radius:10px;font-size:.95rem;">
         <button type="submit" style="padding:.8rem 1.5rem;background:#2563eb;color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer;">Envoyer</button>
     </form>
 </div>

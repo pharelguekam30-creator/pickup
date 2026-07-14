@@ -4,7 +4,7 @@
 
 @section('content')
 <div style="max-width:800px;margin:0 auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem;">
         <div>
             <h1 style="font-size:1.3rem;font-weight:bold;color:#1e3a8a;">Collectes — {{ $subscription->plan->name ?? 'N/A' }}</h1>
             <p style="color:#6b7280;font-size:.85rem;">
@@ -32,7 +32,8 @@
     </div>
 
     <div style="background:#fff;border-radius:1rem;box-shadow:0 2px 8px #00000011;overflow:hidden;">
-        <table style="width:100%;border-collapse:collapse;">
+        <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:420px;">
             <thead style="background:#f9fafb;">
                 <tr>
                     <th style="padding:.8rem 1rem;text-align:left;color:#374151;font-size:.85rem;">Date</th>
@@ -83,6 +84,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 
     {{-- PAIEMENT EFFECTUÉ --}}

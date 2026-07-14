@@ -11,179 +11,139 @@
 
 @section('content')
 <div class="dashboard-wrapper">
-    <div class="dashboard-top">
-        <div class="dashboard-card total">
-            <p class="text-xs uppercase tracking-wide">Total Interventions</p>
-            <p class="text-3xl font-bold">{{ $stats['total'] ?? 0 }}</p>
-        </div>
-        <div class="dashboard-card pending">
-            <p class="text-xs uppercase tracking-wide">En attente</p>
-            <p class="text-3xl font-bold">{{ $stats['pending'] ?? 0 }}</p>
-        </div>
-        <div class="dashboard-card accepted">
-            <p class="text-xs uppercase tracking-wide">Acceptées</p>
-            <p class="text-3xl font-bold">{{ $stats['accepted'] ?? 0 }}</p>
-        </div>
-        <div class="dashboard-card canceled">
-            <p class="text-xs uppercase tracking-wide">Annulées</p>
-            <p class="text-3xl font-bold">{{ $stats['canceled'] ?? 0 }}</p>
-        </div>
-        <div class="dashboard-card" style="background:#ede9fe;color:#7c3aed;">
-            <p class="text-xs uppercase tracking-wide">A confirmer</p>
-            <p class="text-3xl font-bold">{{ $stats['awaiting_confirmation'] ?? 0 }}</p>
-        </div>
-        <div class="dashboard-card completed" style="background:#dbeafe;color:#1e3a8a;">
-            <p class="text-xs uppercase tracking-wide">Terminées</p>
-            <p class="text-3xl font-bold">{{ $stats['completed'] ?? 0 }}</p>
-        </div>
+    <div class="stats-row">
+        <div class="stat-card-v total"><p class="stat-label-v">Total</p><p class="stat-value-v">{{ $stats['total'] ?? 0 }}</p></div>
+        <div class="stat-card-v pending"><p class="stat-label-v">En attente</p><p class="stat-value-v">{{ $stats['pending'] ?? 0 }}</p></div>
+        <div class="stat-card-v accepted"><p class="stat-label-v">Acceptées</p><p class="stat-value-v">{{ $stats['accepted'] ?? 0 }}</p></div>
+        <div class="stat-card-v canceled"><p class="stat-label-v">Annulées</p><p class="stat-value-v">{{ $stats['canceled'] ?? 0 }}</p></div>
+        <div class="stat-card-v awaiting"><p class="stat-label-v">A confirmer</p><p class="stat-value-v">{{ $stats['awaiting_confirmation'] ?? 0 }}</p></div>
+        <div class="stat-card-v completed-v"><p class="stat-label-v">Terminées</p><p class="stat-value-v">{{ $stats['completed'] ?? 0 }}</p></div>
     </div>
 
-    <div class="dashboard-section">
-        <h2>Interventions</h2>
+    <div class="section-card">
+        <h2 class="section-title">Interventions</h2>
 
         @if(session('success'))
-            <div class="mb-4 p-3 rounded" style="border:1px solid #16a34a;background:#dcfce7;color:#065f46;">{{ session('success') }}</div>
+            <div class="alert-success-v">{{ session('success') }}</div>
         @endif
         @if(session('error'))
-            <div class="mb-4 p-3 rounded" style="border:1px solid #dc2626;background:#fef2f2;color:#991b1b;">{{ session('error') }}</div>
+            <div class="alert-error-v">{{ session('error') }}</div>
         @endif
 
-        <div class="tabs" style="display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid #e5e7eb;">
-            <button class="tab-btn active" data-tab="en-cours" style="padding:0.75rem 1.5rem;border:none;background:none;font-weight:600;color:#4f46e5;border-bottom:2px solid #4f46e5;margin-bottom:-2px;cursor:pointer;transition:all 0.2s;font-size:0.95rem;">
+        <div class="tabs-row">
+            <button class="tab-btn-v active" data-tab="en-cours">
                 En cours
                 @if(($stats['pending']+$stats['accepted']+$stats['awaiting_confirmation']) > 0)
-                    <span style="background:#4f46e5;color:#fff;font-size:0.7rem;padding:1px 7px;border-radius:10px;margin-left:5px;font-weight:700;">{{ $stats['pending']+$stats['accepted']+$stats['awaiting_confirmation'] }}</span>
+                    <span class="tab-count tab-count-active">{{ $stats['pending']+$stats['accepted']+$stats['awaiting_confirmation'] }}</span>
                 @endif
             </button>
-            <button class="tab-btn" data-tab="historique" style="padding:0.75rem 1.5rem;border:none;background:none;font-weight:500;color:#6b7280;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;transition:all 0.2s;font-size:0.95rem;">
+            <button class="tab-btn-v" data-tab="historique">
                 Historique
                 @if(($stats['completed']+$stats['canceled']) > 0)
-                    <span style="background:#9ca3af;color:#fff;font-size:0.7rem;padding:1px 7px;border-radius:10px;margin-left:5px;font-weight:700;">{{ $stats['completed']+$stats['canceled'] }}</span>
+                    <span class="tab-count">{{ $stats['completed']+$stats['canceled'] }}</span>
                 @endif
             </button>
         </div>
 
-        <div id="tab-en-cours" class="tab-content">
-            <div class="overflow-x-auto">
-                <table class="dashboard-table table-auto text-left">
-                    <thead class="bg-gray-100 text-gray-700">
-                        <tr>
-                            <th class="px-4 py-3">N°</th>
-                            <th class="px-4 py-3">Client</th>
-                            <th class="px-4 py-3">Service</th>
-                            <th class="px-4 py-3">Date prévue</th>
-                            <th class="px-4 py-3">Statut</th>
-                            <th class="px-4 py-3">Actions</th>
-                        </tr>
-                    </thead>
+        <div id="tab-en-cours" class="tab-panel">
+            <div class="table-scroll">
+                <table class="table-v">
+                    <thead><tr>
+                        <th>N°</th><th>Client</th><th>Service</th><th>Date</th><th>Statut</th><th>Actions</th>
+                    </tr></thead>
                     <tbody>
                         @php $activeInterventions = $interventions->filter(fn($i) => in_array($i->status, ['pending', 'accepted', 'completed_vidangeur'])); @endphp
                         @forelse($activeInterventions as $intervention)
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="px-4 py-3 font-medium">{{ $intervention->id }}</td>
-                                <td class="px-4 py-3">{{ optional($intervention->client)->name ?? 'Inconnu' }}</td>
-                                <td class="px-4 py-3">{{ optional($intervention->service)->name ?? 'N/A' }}</td>
-                                <td class="px-4 py-3">{{ optional($intervention->reservation_date)->format('Y-m-d H:i') ?? 'N/A' }}</td>
-                                <td class="px-4 py-3">
+                            <tr>
+                                <td data-label="N°">{{ $intervention->id }}</td>
+                                <td data-label="Client">{{ optional($intervention->client)->name ?? 'Inconnu' }}</td>
+                                <td data-label="Service">{{ optional($intervention->service)->name ?? 'N/A' }}</td>
+                                <td data-label="Date">{{ optional($intervention->reservation_date)->format('Y-m-d H:i') ?? 'N/A' }}</td>
+                                <td data-label="Statut">
                                     @php
-                                        ['badge' => $badge, 'label' => $label] = match($intervention->status) {
-                                            'pending' => ['badge' => 'badge-pending', 'label' => 'En attente'],
-                                            'accepted' => ['badge' => 'badge-accepted', 'label' => 'Acceptée'],
-                                            'completed_vidangeur' => ['badge' => 'bg-purple-100 text-purple-700', 'label' => 'Attente client'],
-                                            default => ['badge' => 'bg-gray-100 text-gray-600', 'label' => $intervention->status]
+                                        $label = match($intervention->status) {
+                                            'pending' => 'En attente',
+                                            'accepted' => 'Acceptée',
+                                            'completed_vidangeur' => 'Attente client',
+                                            default => $intervention->status
+                                        };
+                                        $cls = match($intervention->status) {
+                                            'pending' => 'badge-v-pending',
+                                            'accepted' => 'badge-v-accepted',
+                                            'completed_vidangeur' => 'badge-v-waiting',
+                                            default => 'badge-v-default'
                                         };
                                     @endphp
-                                    <span class="px-3 py-1 rounded-full text-sm font-semibold {{ $badge }}">{{ $label }}</span>
+                                    <span class="badge-v {{ $cls }}">{{ $label }}</span>
                                 </td>
-                                <td class="px-4 py-3 space-x-2">
+                                <td data-label="Actions" class="actions-cell">
                                     @if($intervention->status === 'pending')
-                                        <form method="POST" action="{{ route('reservations.accept', $intervention->id) }}" class="inline">
+                                        <form method="POST" action="{{ route('reservations.accept', $intervention->id) }}" class="inline-form">
                                             @csrf
-                                            <button type="submit" class="px-3 py-1 rounded bg-green-600 text-white hover:bg-green-700 transition">Accepter</button>
+                                            <button type="submit" class="btn-v btn-v-accept">Accepter</button>
+                                        </form>
+                                        <form method="POST" action="{{ route('reservations.cancel', $intervention->id) }}" class="inline-form">
+                                            @csrf
+                                            <button type="submit" class="btn-v btn-v-reject">Refuser</button>
                                         </form>
                                     @endif
-
                                     @if($intervention->status === 'accepted')
-                                        <form method="POST" action="{{ route('reservations.complete', $intervention->id) }}" class="inline">
+                                        <form method="POST" action="{{ route('reservations.complete', $intervention->id) }}" class="inline-form">
                                             @csrf
-                                            <button type="submit" class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 transition">Terminé</button>
+                                            <button type="submit" class="btn-v btn-v-done">Terminé</button>
                                         </form>
                                     @endif
-
                                     @if($intervention->status === 'completed_vidangeur')
-                                        <span style="display:inline-block;padding:.3rem .6rem;background:#ede9fe;color:#7c3aed;border-radius:8px;font-size:.8rem;font-weight:600;">Attente client</span>
+                                        <span class="waiting-badge">Attente client</span>
                                     @endif
-
-                                    @if($intervention->status === 'pending')
-                                        <form method="POST" action="{{ route('reservations.cancel', $intervention->id) }}" class="inline">
-                                            @csrf
-                                            <button type="submit" class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 transition">Refuser</button>
-                                        </form>
-                                    @endif
-
                                     @if($intervention->client_id)
                                         @php $nb = $unreadCounts[$intervention->id] ?? 0; @endphp
-                                        <a href="{{ route('chat.show', $intervention->id) }}" class="px-3 py-1 rounded inline-block text-center" style="font-size:.85rem;text-decoration:none;background:{{ $nb ? '#dbeafe' : '#e5e7eb' }};color:{{ $nb ? '#2563eb' : '#374151' }};display:inline-flex;align-items:center;gap:4px;">
+                                        <a href="{{ route('chat.show', $intervention->id) }}" class="btn-v-chat {{ $nb ? 'chat-active' : '' }}">
                                             Discuter
-                                            @if($nb > 0)
-                                                <span style="background:#ef4444;color:#fff;font-size:.65rem;padding:1px 6px;border-radius:10px;font-weight:700;">{{ $nb }}</span>
-                                            @endif
+                                            @if($nb > 0)<span class="chat-count">{{ $nb }}</span>@endif
                                         </a>
                                     @endif
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="6" class="px-4 py-5 text-center text-gray-500">Aucune intervention en cours.</td></tr>
+                            <tr><td colspan="6" class="empty-cell">Aucune intervention en cours.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <div id="tab-historique" class="tab-content" style="display:none;">
-            <div class="overflow-x-auto">
-                <table class="dashboard-table table-auto text-left">
-                    <thead class="bg-gray-100 text-gray-700">
-                        <tr>
-                            <th class="px-4 py-3">N°</th>
-                            <th class="px-4 py-3">Client</th>
-                            <th class="px-4 py-3">Service</th>
-                            <th class="px-4 py-3">Date</th>
-                            <th class="px-4 py-3">Montant</th>
-                            <th class="px-4 py-3">Statut</th>
-                        </tr>
-                    </thead>
+        <div id="tab-historique" class="tab-panel" style="display:none;">
+            <div class="table-scroll">
+                <table class="table-v">
+                    <thead><tr>
+                        <th>N°</th><th>Client</th><th>Service</th><th>Date</th><th>Montant</th><th>Statut</th>
+                    </tr></thead>
                     <tbody>
                         @php $history = $interventions->filter(fn($i) => in_array($i->status, ['completed', 'canceled'])); @endphp
                         @forelse($history as $intervention)
-                            <tr class="border-b" style="{{ $intervention->status === 'completed' ? 'background:#f0fdf4;' : 'background:#fafafa;' }}">
-                                <td class="px-4 py-3" style="color:#6b7280;">{{ $intervention->id }}</td>
-                                <td class="px-4 py-3" style="color:#6b7280;">{{ optional($intervention->client)->name ?? 'Inconnu' }}</td>
-                                <td class="px-4 py-3" style="color:#6b7280;">{{ optional($intervention->service)->name ?? 'N/A' }}</td>
-                                <td class="px-4 py-3" style="color:#6b7280;">{{ optional($intervention->reservation_date)->format('Y-m-d H:i') ?? 'N/A' }}</td>
-                                <td class="px-4 py-3" style="color:#6b7280;">
+                            <tr class="{{ $intervention->status === 'completed' ? 'row-completed' : 'row-canceled' }}">
+                                <td data-label="N°">{{ $intervention->id }}</td>
+                                <td data-label="Client">{{ optional($intervention->client)->name ?? 'Inconnu' }}</td>
+                                <td data-label="Service">{{ optional($intervention->service)->name ?? 'N/A' }}</td>
+                                <td data-label="Date">{{ optional($intervention->reservation_date)->format('Y-m-d H:i') ?? 'N/A' }}</td>
+                                <td data-label="Montant">
                                     @if($intervention->status === 'completed' && $intervention->service)
                                         {{ number_format($intervention->service->price, 0, ',', ' ') }} FCFA
                                     @else
                                         —
                                     @endif
                                 </td>
-                                <td class="px-4 py-3">
+                                <td data-label="Statut">
                                     @if($intervention->status === 'completed')
-                                        <span style="display:inline-flex;align-items:center;gap:4px;padding:.25rem .6rem;background:#dcfce7;color:#166534;border-radius:8px;font-size:.8rem;font-weight:600;">
-                                            <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                            Payée
-                                        </span>
+                                        <span class="status-badge status-paid">Payée</span>
                                     @else
-                                        <span style="display:inline-flex;align-items:center;gap:4px;padding:.25rem .6rem;background:#fef2f2;color:#991b1b;border-radius:8px;font-size:.8rem;font-weight:600;">
-                                            <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-                                            Annulée
-                                        </span>
+                                        <span class="status-badge status-canceled">Annulée</span>
                                     @endif
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="6" class="px-4 py-5 text-center text-gray-500">Aucun historique.</td></tr>
+                            <tr><td colspan="6" class="empty-cell">Aucun historique.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -191,45 +151,86 @@
         </div>
     </div>
 
-    <div class="dashboard-section">
-        <h2>Statistiques avancées</h2>
-        <div class="dashboard-top" style="grid-template-columns: repeat(auto-fit,minmax(180px,1fr));">
-            <div class="dashboard-card total" style="color:#FFF; box-shadow:0 4px 10px rgba(79,70,229,.25);">
-                <p class="text-xs uppercase tracking-wide">Interventions totales</p>
-                <p class="text-3xl font-bold">{{ $stats['total'] ?? 0 }}</p>
-            </div>
-            <div class="dashboard-card pending" style="color:#FFF; box-shadow:0 4px 10px rgba(245,158,11,.25);">
-                <p class="text-xs uppercase tracking-wide">En attente</p>
-                <p class="text-3xl font-bold">{{ $stats['pending'] ?? 0 }}</p>
-            </div>
-            <div class="dashboard-card accepted" style="color:#FFF; box-shadow:0 4px 10px rgba(16,185,129,.25);">
-                <p class="text-xs uppercase tracking-wide">Acceptées</p>
-                <p class="text-3xl font-bold">{{ $stats['accepted'] ?? 0 }}</p>
-            </div>
-            <div class="dashboard-card canceled" style="color:#FFF; box-shadow:0 4px 10px rgba(239,68,68,.25);">
-                <p class="text-xs uppercase tracking-wide">Annulées</p>
-                <p class="text-3xl font-bold">{{ $stats['canceled'] ?? 0 }}</p>
-            </div>
+    <div class="section-card">
+        <h2 class="section-title">Statistiques avancées</h2>
+        <div class="stats-row-sm">
+            <div class="stat-card-v total"><p class="stat-label-v">Total</p><p class="stat-value-v">{{ $stats['total'] ?? 0 }}</p></div>
+            <div class="stat-card-v pending"><p class="stat-label-v">En attente</p><p class="stat-value-v">{{ $stats['pending'] ?? 0 }}</p></div>
+            <div class="stat-card-v accepted"><p class="stat-label-v">Acceptées</p><p class="stat-value-v">{{ $stats['accepted'] ?? 0 }}</p></div>
+            <div class="stat-card-v canceled"><p class="stat-label-v">Annulées</p><p class="stat-value-v">{{ $stats['canceled'] ?? 0 }}</p></div>
         </div>
     </div>
 </div>
 
 <script>
-document.querySelectorAll('.tab-btn').forEach(function(btn) {
+document.querySelectorAll('.tab-btn-v').forEach(function(btn) {
     btn.addEventListener('click', function() {
-        document.querySelectorAll('.tab-btn').forEach(function(b) {
-            b.style.color = '#6b7280';
-            b.style.borderBottomColor = 'transparent';
-            b.style.fontWeight = '500';
+        document.querySelectorAll('.tab-btn-v').forEach(function(b) {
+            b.classList.remove('active');
         });
-        this.style.color = '#4f46e5';
-        this.style.borderBottomColor = '#4f46e5';
-        this.style.fontWeight = '600';
-        document.querySelectorAll('.tab-content').forEach(function(tc) {
+        this.classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(function(tc) {
             tc.style.display = 'none';
         });
         document.getElementById('tab-' + this.dataset.tab).style.display = '';
     });
 });
 </script>
+<style>
+.stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:16px; }
+.stats-row-sm { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; }
+.stat-card-v { border-radius:12px; padding:12px; color:#fff; box-shadow:0 4px 14px rgba(0,0,0,0.08); }
+.stat-card-v.total { background:linear-gradient(90deg,#4f46e5,#3b82f6); }
+.stat-card-v.pending { background:linear-gradient(90deg,#f59e0b,#f97316); }
+.stat-card-v.accepted { background:linear-gradient(90deg,#10b981,#059669); }
+.stat-card-v.canceled { background:linear-gradient(90deg,#ef4444,#b91c1c); }
+.stat-card-v.awaiting { background:#ede9fe; color:#7c3aed; }
+.stat-card-v.completed-v { background:#dbeafe; color:#1e3a8a; }
+.stat-label-v { font-size:0.65rem; text-transform:uppercase; letter-spacing:0.05em; opacity:0.9; }
+.stat-value-v { font-size:clamp(1.1rem,4vw,1.6rem); font-weight:bold; margin-top:2px; }
+.section-card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:14px; margin-bottom:14px; }
+.section-title { font-size:clamp(1rem,3vw,1.2rem); font-weight:bold; color:#1f2937; margin-bottom:10px; }
+.alert-success-v { padding:8px 12px; border-radius:8px; border:1px solid #16a34a; background:#dcfce7; color:#065f46; margin-bottom:12px; font-size:0.85rem; }
+.alert-error-v { padding:8px 12px; border-radius:8px; border:1px solid #dc2626; background:#fef2f2; color:#991b1b; margin-bottom:12px; font-size:0.85rem; }
+.tabs-row { display:flex; gap:0; margin-bottom:12px; border-bottom:2px solid #e5e7eb; overflow-x:auto; }
+.tab-btn-v { padding:0.5rem 1rem; border:none; background:none; font-weight:500; color:#6b7280; border-bottom:2px solid transparent; margin-bottom:-2px; cursor:pointer; font-size:0.85rem; white-space:nowrap; transition:all 0.2s; }
+.tab-btn-v.active { color:#4f46e5; border-bottom-color:#4f46e5; font-weight:600; }
+.tab-count { background:#9ca3af; color:#fff; font-size:0.6rem; padding:1px 6px; border-radius:10px; margin-left:4px; font-weight:700; }
+.tab-count-active { background:#4f46e5; }
+.table-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.table-v { width:100%; border-collapse:collapse; font-size:0.85rem; }
+.table-v th { text-align:left; padding:8px 6px; color:#64748b; font-size:0.75rem; border-bottom:2px solid #e5e7eb; text-transform:uppercase; }
+.table-v td { padding:8px 6px; border-bottom:1px solid #e5e7eb; }
+.badge-v { display:inline-block; padding:2px 8px; border-radius:999px; font-size:0.65rem; font-weight:700; text-transform:uppercase; }
+.badge-v-pending { background:#fef3c7; color:#92400e; }
+.badge-v-accepted { background:#d1fae5; color:#064e3b; }
+.badge-v-waiting { background:#ede9fe; color:#6d28d9; }
+.badge-v-default { background:#f1f5f9; color:#475569; }
+.actions-cell { display:flex; flex-wrap:wrap; gap:4px; align-items:center; }
+.inline-form { display:inline; }
+.btn-v { border:none; padding:4px 10px; border-radius:6px; font-size:0.7rem; cursor:pointer; color:#fff; font-weight:600; }
+.btn-v-accept { background:#059669; }
+.btn-v-reject { background:#dc2626; }
+.btn-v-done { background:#2563eb; }
+.waiting-badge { display:inline-block; padding:3px 8px; background:#ede9fe; color:#7c3aed; border-radius:8px; font-size:0.7rem; font-weight:600; }
+.btn-v-chat { display:inline-flex; align-items:center; gap:3px; padding:3px 8px; background:#e5e7eb; color:#374151; border-radius:6px; font-size:0.7rem; text-decoration:none; font-weight:600; }
+.chat-active { background:#dbeafe; color:#2563eb; }
+.chat-count { background:#ef4444; color:#fff; font-size:0.55rem; padding:1px 5px; border-radius:8px; font-weight:700; }
+.empty-cell { padding:16px; text-align:center; color:#9ca3af; }
+.row-completed { background:#f0fdf4; }
+.row-canceled { background:#fafafa; }
+.status-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:8px; font-size:0.7rem; font-weight:600; }
+.status-paid { background:#dcfce7; color:#166534; }
+.status-canceled { background:#fef2f2; color:#991b1b; }
+@media (max-width:600px) {
+    .stats-row { grid-template-columns:1fr 1fr; gap:6px; }
+    .stats-row-sm { grid-template-columns:1fr 1fr; gap:6px; }
+    .stat-card-v { padding:8px; }
+    .stat-value-v { font-size:1.1rem; }
+    .table-v { font-size:0.7rem; }
+    .table-v th, .table-v td { padding:5px 3px; }
+    .tab-btn-v { font-size:0.75rem; padding:0.4rem 0.7rem; }
+    .btn-v { font-size:0.65rem; padding:3px 7px; }
+}
+</style>
 @endsection

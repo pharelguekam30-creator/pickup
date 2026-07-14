@@ -3,11 +3,11 @@
 @section('content')
 <div class="dashboard-wrapper" style="max-width:800px;margin:2rem auto;background:#fff;border-radius:1.5rem;box-shadow:0 2px 16px #2563eb22;padding:2.5rem 2rem;">
     <div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:2rem;flex-wrap:wrap;">
-        <div style="width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#10b981);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:bold;">
+        <div style="width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#10b981);display:flex;align-items:center;justify-content:center;color:#fff;font-size:clamp(1.5rem,5vw,2rem);font-weight:bold;">
             {{ strtoupper(substr($user->name, 0, 1)) }}
         </div>
         <div style="flex:1;">
-            <h2 style="font-size:1.8rem;font-weight:bold;color:#1e3a8a;">{{ $user->name }}</h2>
+            <h2 style="font-size:clamp(1.3rem,5vw,1.8rem);font-weight:bold;color:#1e3a8a;">{{ $user->name }}</h2>
             <span style="display:inline-block;padding:.2rem .8rem;border-radius:1rem;background:#dbeafe;color:#1e40af;font-size:.8rem;font-weight:600;">{{ ucfirst($user->role) }}</span>
         </div>
         <a href="{{ route('users.edit', $user->id) }}" style="padding:.6rem 1.2rem;background:#f59e0b;color:#fff;border-radius:1rem;text-decoration:none;font-weight:600;">Modifier</a>

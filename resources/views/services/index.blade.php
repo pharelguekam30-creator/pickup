@@ -5,13 +5,13 @@
 @section('content')
 
 <div class="dashboard-wrapper" style="max-width:1100px;margin:2rem auto;background:#fff;border-radius:1.5rem;box-shadow:0 2px 16px #2563eb22;padding:2.5rem 2rem;">
-    <h1 style="font-size:2.2rem;font-weight:bold;color:#2563eb;margin-bottom:2.5rem;text-align:center;">Nos Services</h1>
+    <h1 style="font-size:clamp(1.4rem,5vw,2.2rem);font-weight:bold;color:#2563eb;margin-bottom:2.5rem;text-align:center;">Nos Services</h1>
 
     @if(session('success'))
         <div style="border:1px solid #16a34a;background:#dcfce7;color:#065f46;padding:.75rem 1rem;border-radius:.5rem;margin-bottom:1.5rem;text-align:center;">{{ session('success') }}</div>
     @endif
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:2rem;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:1.5rem;">
         @foreach($services as $service)
             <div style="background:linear-gradient(135deg,#e0e7ff 0%,#fff 100%);border-radius:1.2rem;box-shadow:0 4px 16px #2563eb11;padding:2rem 1.5rem;display:flex;flex-direction:column;justify-content:space-between;position:relative;min-height:260px;">
                 <div style="position:absolute;top:1.2rem;right:1.2rem;">

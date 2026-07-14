@@ -13,39 +13,20 @@
 @section('content')
 <div class="dashboard-wrapper">
     @if (session('success'))
-        <div style="padding:12px 16px;border-radius:10px;background:#dcfce7;color:#16a34a;font-weight:600;margin-bottom:1rem;border:1px solid #bbf7d0;">{{ session('success') }}</div>
+        <div class="alert-success-v">{{ session('success') }}</div>
     @endif
     @if (session('error'))
-        <div style="padding:12px 16px;border-radius:10px;background:#fee2e2;color:#dc2626;font-weight:600;margin-bottom:1rem;border:1px solid #fca5a5;">{{ session('error') }}</div>
+        <div class="alert-error-v">{{ session('error') }}</div>
     @endif
 
-    <h1 class="text-2xl font-bold mb-6 text-blue-700">Dashboard Administrateur</h1>
+    <h2 class="admin-title">Dashboard Administrateur</h2>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;">
-        <div style="background:#fff;padding:1rem;border-radius:1rem;box-shadow:0 2px 8px #00000011;">
-            <p style="color:#94a3b8;font-size:.75rem;">Utilisateurs</p>
-            <p style="font-size:1.8rem;font-weight:bold;color:#1e293b;">{{ \App\Models\User::count() }}</p>
-            <a href="{{ route('users.index') }}" style="font-size:.85rem;color:#2563eb;">Gerer</a>
-        </div>
-        <div style="background:#fff;padding:1rem;border-radius:1rem;box-shadow:0 2px 8px #00000011;">
-            <p style="color:#94a3b8;font-size:.75rem;">Services</p>
-            <p style="font-size:1.8rem;font-weight:bold;color:#1e293b;">{{ \App\Models\Service::count() }}</p>
-            <a href="{{ route('services.index') }}" style="font-size:.85rem;color:#2563eb;">Gerer</a>
-        </div>
-        <div style="background:#fff;padding:1rem;border-radius:1rem;box-shadow:0 2px 8px #00000011;">
-            <p style="color:#94a3b8;font-size:.75rem;">Réservations</p>
-            <p style="font-size:1.8rem;font-weight:bold;color:#1e293b;">{{ \App\Models\Reservation::count() }}</p>
-            <a href="{{ route('reservations.index') }}" style="font-size:.85rem;color:#2563eb;">Gérer</a>
-        </div>
-        <div style="background:#fff;padding:1rem;border-radius:1rem;box-shadow:0 2px 8px #00000011;">
-            <p style="color:#94a3b8;font-size:.75rem;">Plans de collecte</p>
-            <p style="font-size:1.8rem;font-weight:bold;color:#1e293b;">{{ \App\Models\CollectionPlan::count() }}</p>
-            <a href="{{ route('admin.plans.index') }}" style="font-size:.85rem;color:#2563eb;">Gérer</a>
-        </div>
-        <div style="background:#ede9fe;padding:1rem;border-radius:1rem;box-shadow:0 2px 8px #00000011;border:2px solid #7c3aed;">
-            <p style="color:#7c3aed;font-size:.75rem;font-weight:700;">A confirmer</p>
-            <p style="font-size:1.8rem;font-weight:bold;color:#5b21b6;">{{ \App\Models\Reservation::where('status', 'completed_vidangeur')->count() }}</p>
-        </div>
+    <div class="admin-stats">
+        <div class="admin-stat-card"><p class="admin-stat-label">Utilisateurs</p><p class="admin-stat-value">{{ \App\Models\User::count() }}</p><a href="{{ route('users.index') }}" class="admin-stat-link">Gerer</a></div>
+        <div class="admin-stat-card"><p class="admin-stat-label">Services</p><p class="admin-stat-value">{{ \App\Models\Service::count() }}</p><a href="{{ route('services.index') }}" class="admin-stat-link">Gerer</a></div>
+        <div class="admin-stat-card"><p class="admin-stat-label">Réservations</p><p class="admin-stat-value">{{ \App\Models\Reservation::count() }}</p><a href="{{ route('reservations.index') }}" class="admin-stat-link">Gérer</a></div>
+        <div class="admin-stat-card"><p class="admin-stat-label">Plans de collecte</p><p class="admin-stat-value">{{ \App\Models\CollectionPlan::count() }}</p><a href="{{ route('admin.plans.index') }}" class="admin-stat-link">Gérer</a></div>
+        <div class="admin-stat-card admin-stat-highlight"><p class="admin-stat-label" style="color:#7c3aed;font-weight:700;">A confirmer</p><p class="admin-stat-value" style="color:#5b21b6;">{{ \App\Models\Reservation::where('status', 'completed_vidangeur')->count() }}</p></div>
     </div>
 
     @php
@@ -56,44 +37,37 @@
     @endphp
 
     @if($pendingConfirmations->count() > 0)
-    <div style="background:#fff;border-radius:1rem;box-shadow:0 2px 8px #00000011;padding:1.5rem;margin-bottom:2rem;">
-        <h2 style="font-size:1.2rem;font-weight:bold;color:#7c3aed;margin-bottom:1rem;">Interventions en attente de confirmation</h2>
-        <div style="overflow-x:auto;">
-            <table style="width:100%;border-collapse:collapse;">
-                <thead>
-                    <tr style="border-bottom:2px solid #e5e7eb;">
-                        <th style="text-align:left;padding:.75rem .5rem;color:#64748b;font-size:.85rem;">N</th>
-                        <th style="text-align:left;padding:.75rem .5rem;color:#64748b;font-size:.85rem;">Client</th>
-                        <th style="text-align:left;padding:.75rem .5rem;color:#64748b;font-size:.85rem;">Vidangeur</th>
-                        <th style="text-align:left;padding:.75rem .5rem;color:#64748b;font-size:.85rem;">Service</th>
-                        <th style="text-align:left;padding:.75rem .5rem;color:#64748b;font-size:.85rem;">Montant</th>
-                        <th style="text-align:center;padding:.75rem .5rem;color:#64748b;font-size:.85rem;">Action</th>
-                    </tr>
-                </thead>
+    <div class="admin-section">
+        <h3 class="admin-section-title">Interventions en attente de confirmation</h3>
+        <div class="table-scroll">
+            <table class="admin-table">
+                <thead><tr>
+                    <th>N</th><th>Client</th><th>Vidangeur</th><th>Service</th><th>Montant</th><th>Action</th>
+                </tr></thead>
                 <tbody>
                     @foreach($pendingConfirmations as $r)
-                    <tr style="border-bottom:1px solid #f1f5f9;">
-                        <td style="padding:.75rem .5rem;">#{{ $r->id }}</td>
-                        <td style="padding:.75rem .5rem;">{{ optional($r->client)->name ?? '?' }}</td>
-                        <td style="padding:.75rem .5rem;">{{ optional($r->user)->name ?? '?' }}</td>
-                        <td style="padding:.75rem .5rem;">{{ optional($r->service)->name ?? '?' }}</td>
-                        <td style="padding:.75rem .5rem;font-weight:600;">{{ number_format(optional($r->service)->price ?? 0, 0, ',', ' ') }} FCFA</td>
-                        <td style="padding:.75rem .5rem;text-align:center;">
+                    <tr>
+                        <td data-label="N">#{{ $r->id }}</td>
+                        <td data-label="Client">{{ optional($r->client)->name ?? '?' }}</td>
+                        <td data-label="Vidangeur">{{ optional($r->user)->name ?? '?' }}</td>
+                        <td data-label="Service">{{ optional($r->service)->name ?? '?' }}</td>
+                        <td data-label="Montant" class="admin-price">{{ number_format(optional($r->service)->price ?? 0, 0, ',', ' ') }} FCFA</td>
+                        <td data-label="Action" class="admin-action-cell">
                             @php
                                 $unreadMsg = \App\Models\Message::where('reservation_id', $r->id)->where('sender_id', '!=', auth()->id())->where('is_read', 0)->count();
                             @endphp
-                            <form action="{{ route('admin.forceComplete', $r->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Forcer le paiement ? Le montant sera verse au vidangeur.')">
+                            <form action="{{ route('admin.forceComplete', $r->id) }}" method="POST" class="inline-form" onsubmit="return confirm('Forcer le paiement ?')">
                                 @csrf
-                                <button type="submit" style="padding:.3rem .8rem;background:#16a34a;color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;">Payer</button>
+                                <button type="submit" class="admin-btn admin-btn-pay">Payer</button>
                             </form>
-                            <form action="{{ route('admin.forceCancel', $r->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Annuler cette intervention ? Aucun paiement ne sera effectue.')">
+                            <form action="{{ route('admin.forceCancel', $r->id) }}" method="POST" class="inline-form" onsubmit="return confirm('Annuler cette intervention ?')">
                                 @csrf
-                                <button type="submit" style="padding:.3rem .8rem;background:#dc2626;color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;">Annuler</button>
+                                <button type="submit" class="admin-btn admin-btn-cancel">Annuler</button>
                             </form>
-                            <a href="{{ route('chat.show', $r->id) }}" style="display:inline-flex;align-items:center;gap:3px;padding:.3rem .8rem;background:{{ $unreadMsg ? '#dbeafe' : '#f1f5f9' }};color:{{ $unreadMsg ? '#2563eb' : '#475569' }};border-radius:6px;font-size:.8rem;font-weight:600;text-decoration:none;">
+                            <a href="{{ route('chat.show', $r->id) }}" class="admin-chat-link {{ $unreadMsg ? 'admin-chat-unread' : '' }}">
                                 Discuter
                                 @if($unreadMsg > 0)
-                                    <span style="background:#ef4444;color:#fff;font-size:.6rem;padding:1px 5px;border-radius:8px;font-weight:700;">{{ $unreadMsg }}</span>
+                                    <span class="admin-chat-badge">{{ $unreadMsg }}</span>
                                 @endif
                             </a>
                         </td>
@@ -105,13 +79,51 @@
     </div>
     @endif
 
-    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
-        <a href="{{ route('users.index') }}" style="padding:.8rem 1.5rem;background:#2563eb;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">Utilisateurs</a>
-        <a href="{{ route('services.index') }}" style="padding:.8rem 1.5rem;background:#2563eb;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">Services</a>
-        <a href="{{ route('roles.index') }}" style="padding:.8rem 1.5rem;background:#2563eb;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">Roles</a>
-        <a href="{{ route('reservations.index') }}" style="padding:.8rem 1.5rem;background:#2563eb;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">Reservations</a>
-        <a href="{{ route('payments.index') }}" style="padding:.8rem 1.5rem;background:#2563eb;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">Portefeuille</a>
-        <a href="{{ route('admin.stats') }}" style="padding:.8rem 1.5rem;background:#16a34a;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">Statistiques</a>
+    <div class="admin-links">
+        <a href="{{ route('users.index') }}" class="admin-link">Utilisateurs</a>
+        <a href="{{ route('services.index') }}" class="admin-link">Services</a>
+        <a href="{{ route('roles.index') }}" class="admin-link">Roles</a>
+        <a href="{{ route('reservations.index') }}" class="admin-link">Reservations</a>
+        <a href="{{ route('payments.index') }}" class="admin-link">Portefeuille</a>
+        <a href="{{ route('admin.stats') }}" class="admin-link admin-link-green">Statistiques</a>
     </div>
 </div>
+<style>
+.admin-title { font-size:clamp(1.1rem,3vw,1.5rem); font-weight:bold; color:#1d4ed8; margin-bottom:1rem; }
+.admin-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:0.75rem; margin-bottom:1.5rem; }
+.admin-stat-card { background:#fff; padding:0.75rem; border-radius:1rem; box-shadow:0 2px 8px #00000011; }
+.admin-stat-highlight { background:#ede9fe; border:2px solid #7c3aed; }
+.admin-stat-label { color:#94a3b8; font-size:0.7rem; margin-bottom:2px; }
+.admin-stat-value { font-size:clamp(1.2rem,5vw,1.8rem); font-weight:bold; color:#1e293b; }
+.admin-stat-link { font-size:0.8rem; color:#2563eb; text-decoration:none; }
+.admin-section { background:#fff; border-radius:1rem; box-shadow:0 2px 8px #00000011; padding:1.2rem; margin-bottom:1.5rem; }
+.admin-section-title { font-size:clamp(0.95rem,3vw,1.1rem); font-weight:bold; color:#7c3aed; margin-bottom:0.75rem; }
+.table-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.admin-table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+.admin-table th { text-align:left; padding:0.5rem 0.4rem; color:#64748b; font-size:0.75rem; border-bottom:2px solid #e5e7eb; }
+.admin-table td { padding:0.5rem 0.4rem; border-bottom:1px solid #f1f5f9; }
+.admin-price { font-weight:600; }
+.admin-action-cell { display:flex; flex-wrap:wrap; gap:4px; align-items:center; }
+.admin-btn { border:none; padding:0.25rem 0.6rem; border-radius:6px; font-weight:600; cursor:pointer; color:#fff; font-size:0.7rem; }
+.admin-btn-pay { background:#16a34a; }
+.admin-btn-cancel { background:#dc2626; }
+.admin-chat-link { display:inline-flex; align-items:center; gap:3px; padding:0.25rem 0.6rem; background:#f1f5f9; color:#475569; border-radius:6px; font-size:0.7rem; font-weight:600; text-decoration:none; }
+.admin-chat-unread { background:#dbeafe; color:#2563eb; }
+.admin-chat-badge { background:#ef4444; color:#fff; font-size:0.55rem; padding:1px 4px; border-radius:8px; font-weight:700; }
+.admin-links { display:flex; gap:0.6rem; flex-wrap:wrap; }
+.admin-link { padding:0.6rem 1.2rem; background:#2563eb; color:#fff; border-radius:10px; text-decoration:none; font-weight:600; font-size:0.85rem; }
+.admin-link-green { background:#16a34a; }
+.alert-success-v { padding:8px 12px; border-radius:8px; border:1px solid #16a34a; background:#dcfce7; color:#065f46; margin-bottom:12px; font-size:0.85rem; }
+.alert-error-v { padding:8px 12px; border-radius:8px; border:1px solid #dc2626; background:#fef2f2; color:#991b1b; margin-bottom:12px; font-size:0.85rem; }
+.inline-form { display:inline; }
+@media (max-width:600px) {
+    .admin-stats { grid-template-columns:1fr 1fr; gap:6px; }
+    .admin-stat-card { padding:0.5rem; }
+    .admin-stat-value { font-size:1.2rem; }
+    .admin-table { font-size:0.7rem; }
+    .admin-table th, .admin-table td { padding:0.35rem 0.25rem; }
+    .admin-section { padding:0.8rem; }
+    .admin-link { font-size:0.75rem; padding:0.5rem 0.8rem; }
+}
+</style>
 @endsection

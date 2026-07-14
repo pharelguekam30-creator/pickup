@@ -23,7 +23,7 @@
             <p style="color:#64748b;">Solde disponible</p>
         </div>
         <div style="text-align:right;">
-            <span style="font-size:2rem;font-weight:bold;color:#2563eb;">{{ number_format($user->solde ?? 0, 0, ',', ' ') }} FCFA</span>
+            <span style="font-size:clamp(1.4rem,5vw,2rem);font-weight:bold;color:#2563eb;">{{ number_format($user->solde ?? 0, 0, ',', ' ') }} FCFA</span>
         </div>
     </div>
 

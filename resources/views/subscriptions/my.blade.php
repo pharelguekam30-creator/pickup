@@ -12,7 +12,7 @@
 
 @section('content')
 <div style="max-width:800px;margin:0 auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem;">
         <h1 style="font-size:1.3rem;font-weight:bold;color:#1e3a8a;">Mes abonnements</h1>
         <a href="{{ route('subscriptions.plans') }}" style="padding:.5rem 1rem;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:.85rem;">Voir les plans</a>
     </div>
@@ -42,7 +42,7 @@
                         @endif
                     </div>
                 </div>
-                <div style="display:flex;gap:.5rem;align-items:center;">
+                <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
                     <a href="{{ route('subscriptions.collections', $sub) }}" style="padding:.4rem .9rem;background:#e0e7ff;color:#4338ca;border-radius:8px;text-decoration:none;font-weight:600;font-size:.8rem;">Collectes</a>
                     @if($sub->month_status === 'paid')
                         <span style="padding:.4rem .9rem;background:#dcfce7;color:#166534;border-radius:8px;font-weight:700;font-size:.8rem;">

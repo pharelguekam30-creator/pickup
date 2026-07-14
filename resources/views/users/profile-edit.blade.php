@@ -4,11 +4,11 @@
 
 @section('content')
 <div class="dashboard-wrapper" style="max-width:700px;margin:2rem auto;background:#fff;border-radius:1.5rem;box-shadow:0 2px 16px #2563eb22;padding:2.5rem 2rem;">
-    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:2rem;">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:2rem;flex-wrap:wrap;">
         <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#10b981);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;font-weight:bold;flex-shrink:0;">
             {{ strtoupper(substr($user->name, 0, 1)) }}
         </div>
-        <h2 style="font-size:1.6rem;font-weight:bold;color:#1e3a8a;">Modifier mon profil</h2>
+        <h2 style="font-size:clamp(1.2rem,5vw,1.6rem);font-weight:bold;color:#1e3a8a;">Modifier mon profil</h2>
     </div>
 
     @if ($errors->any())
@@ -31,7 +31,7 @@
         @csrf
         @method('PUT')
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="profile-form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
             <div style="grid-column:1/-1;">
                 <label style="display:block;font-weight:600;color:#374151;margin-bottom:.3rem;">Nom</label>
                 <input type="text" name="name" value="{{ old('name', $user->name) }}"
@@ -128,7 +128,7 @@
         </script>
         @endif
 
-        <div style="display:flex;gap:1rem;margin-top:2rem;">
+        <div style="display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;">
             <button type="submit" style="padding:.8rem 2rem;background:#2563eb;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;">
                 Enregistrer
             </button>
@@ -138,4 +138,11 @@
         </div>
     </form>
 </div>
+<style>
+@media (max-width: 600px) {
+    .profile-form-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
 @endsection

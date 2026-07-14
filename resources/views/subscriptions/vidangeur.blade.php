@@ -32,7 +32,7 @@
                     </span>
                 @endif
             </div>
-            <div style="display:flex;gap:.5rem;align-items:center;">
+            <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
                 @if($sub->month_status === 'paid')
                     <span style="padding:.4rem .9rem;background:#dcfce7;color:#166534;border-radius:8px;font-weight:700;font-size:.8rem;">
                         Reçu : {{ number_format(($sub->plan->price_per_month ?? 0) * 0.65, 0, ',', ' ') }} FCFA

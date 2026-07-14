@@ -21,7 +21,7 @@
             </div>
         @endif
         <div style="flex:1;">
-            <h2 style="font-size:1.8rem;font-weight:bold;color:#1e3a8a;margin-bottom:.25rem;">{{ $user->name }}</h2>
+            <h2 style="font-size:clamp(1.3rem,5vw,1.8rem);font-weight:bold;color:#1e3a8a;margin-bottom:.25rem;">{{ $user->name }}</h2>
             <p style="color:#64748b;">
                 <span style="display:inline-block;padding:.2rem .8rem;border-radius:1rem;background:#dbeafe;color:#1e40af;font-size:.8rem;font-weight:600;">
                     {{ ucfirst($user->role) }}
@@ -82,7 +82,7 @@
     <div style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border-radius:1rem;padding:1.25rem;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
         <div>
             <p style="color:#1e40af;font-weight:600;">Solde disponible</p>
-            <p style="font-size:1.8rem;font-weight:bold;color:#2563eb;">{{ number_format($user->solde ?? 0, 0, ',', ' ') }} FCFA</p>
+            <p style="font-size:clamp(1.2rem,5vw,1.8rem);font-weight:bold;color:#2563eb;">{{ number_format($user->solde ?? 0, 0, ',', ' ') }} FCFA</p>
         </div>
         <a href="{{ route('payments.index') }}" style="padding:.6rem 1.2rem;background:#2563eb;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;">
             Gerer mon portefeuille

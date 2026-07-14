@@ -135,12 +135,12 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])
 
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->match(['get', 'post'], '/admin/brevo-key', function (\Illuminate\Http\Request $request) {
     if ($request->isMethod('post') || $request->has('set_key')) {
-        $key = $request->input('key', '');
+        $key = trim($request->input('key', ''));
         if ($key) {
             file_put_contents(storage_path('app/brevo_key.txt'), $key);
             return 'OK - Cle enregistree (' . strlen($key) . ' caracteres)';
         }
-        return 'ERREUR: cle vide';
+        return 'ERREUR: cle vide - la cle precedente est conservee.';
     }
     $current = file_exists(storage_path('app/brevo_key.txt')) ? file_get_contents(storage_path('app/brevo_key.txt')) : '';
     return '<form method=post><input type=hidden name=_token value="'.csrf_token().'"><label>Cle API Brevo :</label><br><input type=text name=key value="'.htmlspecialchars($current).'" size=60><br><br><button type=submit>Enregistrer</button></form>';

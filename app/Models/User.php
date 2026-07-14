@@ -14,7 +14,7 @@ class User extends Authenticatable
         'name', 'email', 'password', 'role', 'phone', 'photo', 'country', 'region', 
         'city', 'quarter', 'address', 'tarif', 
         'disponibilite', 'birthdate', 'latitude', 'longitude',
-        'solde'
+        'solde', 'verification_code', 'verification_channel'
     ];
 
     protected $hidden = ['password', 'remember_token'];

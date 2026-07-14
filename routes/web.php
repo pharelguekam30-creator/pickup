@@ -204,4 +204,8 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])
     Route::get('/admin/subscriptions', [\App\Http\Controllers\SubscriptionController::class, 'adminDisputes'])->name('admin.subscriptions');
     Route::post('/admin/subscriptions/{subscription}/force-pay', [\App\Http\Controllers\SubscriptionController::class, 'adminForcePay'])->name('admin.subscriptions.force-pay');
     Route::post('/admin/subscriptions/{subscription}/force-cancel-month', [\App\Http\Controllers\SubscriptionController::class, 'adminForceCancelMonth'])->name('admin.subscriptions.force-cancel-month');
+    Route::get('/admin/fix-roles', function () {
+        $fixed = \App\Models\User::whereNull('role')->update(['role' => 'menagere']);
+        return "Comptes fixés : $fixed";
+    });
 });

@@ -134,15 +134,24 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])
 })->name('debug.env');
 
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->match(['get', 'post'], '/admin/brevo-key', function (\Illuminate\Http\Request $request) {
+    // Create settings table if needed
+    try {
+        \Illuminate\Support\Facades\DB::statement('CREATE TABLE IF NOT EXISTS settings (`key` VARCHAR(255) PRIMARY KEY, `value` TEXT)');
+    } catch (\Exception $e) {}
+
     if ($request->isMethod('post') || $request->has('set_key')) {
         $key = trim($request->input('key', ''));
         if ($key) {
             file_put_contents(storage_path('app/brevo_key.txt'), $key);
-            return 'OK - Cle enregistree (' . strlen($key) . ' caracteres)';
+            \Illuminate\Support\Facades\DB::table('settings')->updateOrInsert(['key' => 'brevo_api_key'], ['value' => $key]);
+            return 'OK - Cle enregistree en DB + fichier (' . strlen($key) . ' caracteres)';
         }
         return 'ERREUR: cle vide - la cle precedente est conservee.';
     }
-    $current = file_exists(storage_path('app/brevo_key.txt')) ? file_get_contents(storage_path('app/brevo_key.txt')) : '';
+    $current = \Illuminate\Support\Facades\DB::table('settings')->where('key', 'brevo_api_key')->value('value');
+    if (!$current) {
+        $current = file_exists(storage_path('app/brevo_key.txt')) ? file_get_contents(storage_path('app/brevo_key.txt')) : '';
+    }
     return '<form method=post><input type=hidden name=_token value="'.csrf_token().'"><label>Cle API Brevo :</label><br><input type=text name=key value="'.htmlspecialchars($current).'" size=60><br><br><button type=submit>Enregistrer</button></form>';
 })->name('admin.brevo-key');
 

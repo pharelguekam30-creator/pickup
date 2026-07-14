@@ -14,6 +14,12 @@ class MailHelper
                 $key = trim(file_get_contents($file));
             }
         }
+        if (!$key) {
+            try {
+                $dbKey = \Illuminate\Support\Facades\DB::table('settings')->where('key', 'brevo_api_key')->value('value');
+                if ($dbKey) $key = $dbKey;
+            } catch (\Exception $e) {}
+        }
         return $key ?: null;
     }
 

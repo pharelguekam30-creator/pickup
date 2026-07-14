@@ -44,8 +44,9 @@ Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':vidangeu
     Route::get('/vidangeur/dashboard', [DashboardController::class, 'vidangeur'])->name('vidangeur.dashboard');
 });
 
+Route::middleware('auth')->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
 Route::middleware(['auth', \App\Http\Middleware\RoleMiddleware::class.':admin'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/admin/stats', [DashboardController::class, 'stats'])->name('admin.stats');
 });
 

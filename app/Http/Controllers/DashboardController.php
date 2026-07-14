@@ -22,7 +22,13 @@ class DashboardController extends Controller
     // Dashboard Admin
     public function index()
     {
-        return view('admin.dashboard');
+        $role = auth()->user()->role;
+        return match($role) {
+            'menagere' => redirect()->route('menagere.dashboard'),
+            'vidangeur' => redirect()->route('vidangeur.dashboard'),
+            'admin' => view('admin.dashboard'),
+            default => redirect()->route('home'),
+        };
     }
 
     public function stats()

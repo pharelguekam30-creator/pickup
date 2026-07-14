@@ -19,34 +19,56 @@
 
         <form action="{{ route('register.submit') }}" method="POST" enctype="multipart/form-data">
             @csrf
+
+            <label class="form-label"><span style="color:#dc2626;">*</span> Nom complet</label>
             <input type="text" name="name" placeholder="Nom complet" value="{{ old('name') }}" class="form-field" required>
+
+            <label class="form-label">Email</label>
             <input type="email" name="email" placeholder="Email" value="{{ old('email') }}" class="form-field">
+
+            <label class="form-label"><span style="color:#dc2626;">*</span> Mot de passe</label>
             <input type="password" name="password" placeholder="Mot de passe" class="form-field" required>
+
+            <label class="form-label"><span style="color:#dc2626;">*</span> Confirmer le mot de passe</label>
             <input type="password" name="password_confirmation" placeholder="Confirmer mot de passe" class="form-field" required>
+
+            <label class="form-label">Téléphone</label>
             <input type="text" name="phone" placeholder="Téléphone" value="{{ old('phone') }}" class="form-field">
-            <div style="margin: 8px 0 14px; color: #334155; font-size: 0.95rem;">
-                <label style="display:block; font-weight:600; margin-bottom:8px;">Canal de vérification</label>
-                <select name="verification_channel" class="form-field" required>
-                    <option value="">Choisir un canal</option>
-                    <option value="email" {{ old('verification_channel') === 'email' ? 'selected' : '' }}>Par e-mail</option>
-                    <option value="phone" {{ old('verification_channel') === 'phone' ? 'selected' : '' }}>Par téléphone</option>
-                    <option value="both" {{ old('verification_channel') === 'both' ? 'selected' : '' }}>Par e-mail et téléphone</option>
-                </select>
-                <div style="font-size: 0.9rem; color: #64748b; margin-top: 6px;">Le compte reste bloqué jusqu’à la confirmation du canal choisi.</div>
-            </div>
+
+            <label class="form-label"><span style="color:#dc2626;">*</span> Canal de vérification</label>
+            <select name="verification_channel" class="form-field" required>
+                <option value="">Choisir un canal</option>
+                <option value="email" {{ old('verification_channel') === 'email' ? 'selected' : '' }}>Par e-mail</option>
+                <option value="phone" {{ old('verification_channel') === 'phone' ? 'selected' : '' }}>Par téléphone</option>
+                <option value="both" {{ old('verification_channel') === 'both' ? 'selected' : '' }}>Par e-mail et téléphone</option>
+            </select>
+            <div style="font-size: 0.85rem; color: #64748b; margin: -8px 0 12px;">Le compte reste bloqué jusqu'à la confirmation du canal choisi.</div>
+
+            <label class="form-label"><span style="color:#dc2626;">*</span> Pays</label>
             <input type="text" name="country" placeholder="Pays" value="{{ old('country') }}" class="form-field" required>
+
+            <label class="form-label"><span style="color:#dc2626;">*</span> Région</label>
             <input type="text" name="region" placeholder="Région" value="{{ old('region') }}" class="form-field" required>
+
+            <label class="form-label"><span style="color:#dc2626;">*</span> Ville</label>
             <input type="text" name="city" placeholder="Ville" value="{{ old('city') }}" class="form-field" required>
+
+            <label class="form-label"><span style="color:#dc2626;">*</span> Quartier</label>
             <input type="text" name="quarter" placeholder="Quartier" value="{{ old('quarter') }}" class="form-field" required>
+
+            <label class="form-label"><span style="color:#dc2626;">*</span> Lieux dit</label>
             <input type="text" name="address" placeholder="Lieux dit" value="{{ old('address') }}" class="form-field" required>
-            <input type="date" name="birthdate" placeholder="Date de naissance (facultatif)" value="{{ old('birthdate') }}" class="form-field">
-            <div style="margin:8px 0;">
+
+            <label class="form-label">Date de naissance</label>
+            <input type="date" name="birthdate" value="{{ old('birthdate') }}" class="form-field">
+
+            <div style="margin:10px 0;">
                 <label style="display:block;font-weight:600;color:#374151;margin-bottom:6px;">Photo de profil</label>
                 <input type="file" name="photo" accept="image/*" style="width:100%;padding:10px;border:2px solid #cbd5e1;border-radius:10px;background:#fff;">
             </div>
 
             <div style="margin: 14px 0; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-                <span style="font-weight: 600; color: #334155;">Vous êtes :</span>
+                <span style="font-weight: 600; color: #334155;"><span style="color:#dc2626;">*</span> Vous êtes :</span>
                 <label style="display: inline-flex; align-items: center; gap: 5px; color: #1d4ed8;">
                     <input type="radio" id="vidangeur" name="role" value="vidangeur" onclick="toggleFields();" {{ (old('role', $role ?? '') === 'vidangeur') ? 'checked' : '' }}> Vidangeur
                 </label>
@@ -56,11 +78,14 @@
             </div>
 
             <div id="vidangeur-fields" style="display: none; margin-bottom: 14px;">
-                <input type="text" name="tarif" placeholder="Tarif (ex: 5000 FCFA)" value="{{ old('tarif') }}" class="form-field">
-                <input type="text" name="disponibilite" placeholder="Disponibilités (ex: 8h-18h)" value="{{ old('disponibilite') }}" class="form-field">
+                <label class="form-label">Tarif</label>
+                <input type="text" name="tarif" placeholder="Ex: 5000 FCFA" value="{{ old('tarif') }}" class="form-field">
+                <label class="form-label">Disponibilités</label>
+                <input type="text" name="disponibilite" placeholder="Ex: 8h-18h" value="{{ old('disponibilite') }}" class="form-field">
             </div>
 
             <div id="menagere-fields" style="display: none; margin-bottom: 14px;">
+                <label class="form-label">Années d'expérience</label>
                 <input type="text" name="experience" placeholder="Années d'expérience" value="{{ old('experience') }}" class="form-field">
             </div>
 

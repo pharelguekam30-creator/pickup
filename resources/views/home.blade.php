@@ -111,5 +111,13 @@
     color: #0f172a;
     font-size: 0.95rem;
 }
+@media (max-width: 640px) {
+    .hero-section { padding: 2.5rem 1rem; }
+    .hero-section p { font-size: 1rem; }
+    .testimonials-section { padding: 1.5rem 1rem; }
+    .testimonials-section h2 { font-size: 1.5rem; }
+    .testimonial-card { padding: 1.2rem; }
+    .btn-primary { padding: 0.75rem 1.5rem; font-size: 0.95rem; }
+}
 </style>
 @endsection

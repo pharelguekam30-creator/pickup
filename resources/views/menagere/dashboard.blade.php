@@ -23,9 +23,9 @@
         </div>
     @endif
 
-    <div style="display:flex;justify-content:flex-end;gap:1rem;margin-bottom:2rem;">
-        <a href="{{ route('subscriptions.plans') }}" style="font-size:1rem;padding:1rem 2rem;background:#7c3aed;color:#fff;border-radius:1.5rem;font-weight:bold;box-shadow:0 2px 8px #7c3aed33;">+ Abonnement collecte</a>
-        <a href="{{ route('reservations.create') }}" style="font-size:1.2rem;padding:1rem 2.5rem;background:#2563eb;color:#fff;border-radius:1.5rem;font-weight:bold;box-shadow:0 2px 8px #2563eb33;">+ Nouvelle demande d'intervention</a>
+    <div style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:0.75rem;margin-bottom:2rem;">
+        <a href="{{ route('subscriptions.plans') }}" style="font-size:1rem;padding:0.75rem 1.5rem;background:#7c3aed;color:#fff;border-radius:1.5rem;font-weight:bold;box-shadow:0 2px 8px #7c3aed33;text-decoration:none;text-align:center;">+ Abonnement collecte</a>
+        <a href="{{ route('reservations.create') }}" style="font-size:1rem;padding:0.75rem 1.5rem;background:#2563eb;color:#fff;border-radius:1.5rem;font-weight:bold;box-shadow:0 2px 8px #2563eb33;text-decoration:none;text-align:center;">+ Nouvelle demande d'intervention</a>
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:2rem;">
